@@ -311,7 +311,6 @@ const styles = `
 `;
 
 function PricingPlan({ className }) {
-    const vehicles = usePublicCabs();
     const packages = [
         {
             title: "Local City Rental",
