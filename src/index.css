@@ -1,0 +1,555 @@
+.header-layout1 .header-logo img.brand-logo {
+  display: block;
+  width: clamp(150px, 20vw, 245px);
+  max-height: 76px;
+  object-fit: contain;
+}
+
+.th-menu-wrapper .mobile-logo img.brand-logo {
+  width: 185px;
+  max-width: calc(100% - 40px);
+  max-height: 68px;
+  object-fit: contain;
+}
+
+/* ========================================================
+   Why Choose Us - Balanced 4-Column Card Grid Styling
+   ======================================================== */
+.why-choose-area {
+  background: linear-gradient(180deg, #f8fbfb 0%, #ffffff 100%);
+  position: relative;
+}
+
+.why-choose-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e3e9ea;
+  border-radius: 20px;
+  padding: 42px 26px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.35s ease;
+  box-shadow: 0 6px 20px rgba(17, 61, 72, 0.04);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.why-choose-card.has-thumb {
+  padding: 0;
+  text-align: left;
+}
+
+.why-choose-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 4px;
+  background: var(--theme-color, #1ca8cb);
+  border-radius: 4px 4px 0 0;
+  transition: width 0.35s ease-in-out;
+}
+
+.why-choose-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(28, 168, 203, 0.4);
+  box-shadow: 0 16px 36px rgba(17, 61, 72, 0.1);
+}
+
+.why-choose-card:hover::after {
+  width: 60%;
+}
+
+.why-choose-thumb {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+}
+
+.why-choose-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.why-choose-card:hover .why-choose-thumb img {
+  transform: scale(1.08);
+}
+
+.why-choose-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(17, 61, 72, 0.65) 100%);
+  transition: opacity 0.3s ease;
+}
+
+.why-choose-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(17, 61, 72, 0.88);
+  padding: 4px 11px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.why-choose-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--theme-color, #1ca8cb);
+  padding: 3px 11px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.why-choose-body {
+  padding: 24px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.why-choose-body .why-choose-icon {
+  margin-top: -54px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 3;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #e8f5f7;
+  box-shadow: 0 6px 18px rgba(17, 61, 72, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s ease;
+}
+
+.why-choose-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(28, 168, 203, 0.08);
+  border: 2px solid rgba(28, 168, 203, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  transition: all 0.35s ease;
+}
+
+.why-choose-icon img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.why-choose-card:hover .why-choose-icon {
+  background: var(--theme-color, #1ca8cb);
+  border-color: var(--theme-color, #1ca8cb);
+  box-shadow: 0 8px 22px rgba(28, 168, 203, 0.35);
+}
+
+.why-choose-card:hover .why-choose-icon img {
+  transform: scale(1.1);
+  filter: brightness(0) invert(1);
+}
+
+.why-choose-card .box-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--title-color, #113d48);
+  margin-bottom: 12px;
+  transition: color 0.3s ease;
+}
+
+.why-choose-card:hover .box-title {
+  color: var(--theme-color, #1ca8cb);
+}
+
+.why-choose-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--body-color, #6e7070);
+  margin-bottom: 0;
+  flex-grow: 1;
+}
+
+/* ========================================================
+   Vision, Mission, Experience & Highlights Cards
+   ======================================================== */
+.vm-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e3e9ea;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s ease;
+  box-shadow: 0 6px 24px rgba(17, 61, 72, 0.05);
+}
+
+.vm-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(28, 168, 203, 0.45);
+  box-shadow: 0 18px 45px rgba(17, 61, 72, 0.12);
+}
+
+.vm-card-thumb {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.vm-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.vm-card:hover .vm-card-thumb img {
+  transform: scale(1.08);
+}
+
+.vm-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(17, 61, 72, 0.72) 100%);
+}
+
+.vm-tag {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  background: var(--theme-color, #1ca8cb);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.vm-icon-badge {
+  position: absolute;
+  bottom: -28px;
+  right: 28px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #e8f5f7;
+  box-shadow: 0 8px 22px rgba(17, 61, 72, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: all 0.35s ease;
+}
+
+.vm-icon-badge img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: filter 0.35s ease;
+}
+
+.vm-card:hover .vm-icon-badge {
+  transform: rotate(8deg) scale(1.08);
+  background: var(--theme-color, #1ca8cb);
+  border-color: var(--theme-color, #1ca8cb);
+}
+
+.vm-card:hover .vm-icon-badge img {
+  filter: brightness(0) invert(1);
+}
+
+.vm-card-content {
+  padding: 36px 28px 28px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.vm-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--title-color, #113d48);
+  margin-bottom: 12px;
+  line-height: 1.35;
+  transition: color 0.3s ease;
+}
+
+.vm-card:hover .vm-card-title {
+  color: var(--theme-color, #1ca8cb);
+}
+
+.vm-card-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--body-color, #6e7070);
+  margin-bottom: 20px;
+}
+
+.vm-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px dashed #e3e9ea;
+  padding-top: 18px;
+}
+
+.vm-points li {
+  font-size: 14px;
+  color: #244650;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.vm-points li i {
+  color: var(--theme-color, #1ca8cb);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* ========================================================
+   About Four - Feature Thumbnails & Experience Float Badge
+   ======================================================== */
+.about-feature-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 20px;
+  box-shadow: 0 4px 14px rgba(17, 61, 72, 0.1);
+  border: 2px solid #e8f5f7;
+}
+
+.about-feature-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.about-item:hover .about-feature-thumb img {
+  transform: scale(1.1);
+}
+
+.about-float-badge {
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  background: #ffffff;
+  padding: 12px 20px;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(17, 61, 72, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 5;
+  border-left: 4px solid var(--theme-color, #1ca8cb);
+}
+
+.about-float-badge .badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(28, 168, 203, 0.12);
+  color: var(--theme-color, #1ca8cb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.about-float-badge .badge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-float-badge .badge-text strong {
+  font-size: 16px;
+  color: var(--title-color, #113d48);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.about-float-badge .badge-text span {
+  font-size: 12px;
+  color: var(--body-color, #6e7070);
+}
+
+/* ========================================================
+   Counter Area - Travel Background & Highlights Numbers
+   ======================================================== */
+.counter-area {
+  background: linear-gradient(135deg, rgba(17, 61, 72, 0.94) 0%, rgba(9, 36, 43, 0.96) 100%);
+  position: relative;
+  padding: 80px 0;
+}
+
+.counter-area .counter-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 30px 20px;
+  backdrop-filter: blur(8px);
+  transition: all 0.35s ease;
+}
+
+.counter-area .counter-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-6px);
+  border-color: var(--theme-color, #1ca8cb);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.counter-area .box-number {
+  color: #ffffff !important;
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.counter-area .counter-title {
+  color: #d1ecf1 !important;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0;
+  letter-spacing: 0.3px;
+}
+
+/* ========================================================
+   Header Top Bar Social Icons
+   ======================================================== */
+.header-top .header-social-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-top .header-social-wrap .social-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--body-color, #6e7070);
+  margin-right: 2px;
+  letter-spacing: 0.3px;
+}
+
+.header-top .th-social {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-top .th-social a {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  font-size: 13px;
+  margin-right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(28, 168, 203, 0.1);
+  color: var(--theme-color, #1ca8cb);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.header-top .th-social a:hover {
+  background-color: var(--theme-color, #1ca8cb);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ========================================================
+   Category Slider - Uniform Image Ratio & Sizing
+   ======================================================== */
+.category-card .box-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 24px;
+  margin-bottom: 22px;
+  background-color: #f1f5f9;
+}
+
+.category-card .box-img img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center;
+  border-radius: 24px;
+  display: block;
+  transition: transform 1.2s ease;
+}
+
+.category-card:hover .box-img img {
+  transform: scale(1.1);
+}
+
+/* ========================================================
+   Book Now & Action Buttons - Filled Theme Color by Default
+   ======================================================== */
+.th-btn.style4 {
+  background-color: var(--theme-color, #1ca8cb) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--theme-color, #1ca8cb) !important;
+  box-shadow: 0 4px 14px rgba(28, 168, 203, 0.28);
+  font-weight: 600;
+  z-index: 1;
+}
+
+.th-btn.style4:before {
+  background-color: #168ba8 !important;
+}
+
+.th-btn.style4:hover {
+  background-color: #168ba8 !important;
+  border-color: #168ba8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(28, 168, 203, 0.42);
+  transform: translateY(-2px);
+}
+
+.th-btn.style4.th-icon:after {
+  background-color: #ffffff !important;
+}
+
+.th-btn.style4 * {
+  color: #ffffff !important;
+}
