@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import HeaderOne from '../Components/Header/HeaderOne';
 import FooterFour from '../Components/Footer/FooterFour';
 import ScrollToTop from '../Components/ScrollToTop';
 import Breadcrumb from '../Components/BreadCrumb/Breadcrumb';
-import { dropTaxiCities, getCityAbout, getCityRoutes } from '../Components/data/dropTaxiData';
+import { dropTaxiCities, getCityAbout } from '../Components/data/dropTaxiData';
 import siteConfig, { telHref, waHref } from '../Components/data/siteConfig';
+import api from '../services/api';
+import BookingForm from '../Components/Booking/BookingForm';
 
 const styles = `
 .dtd-section {
@@ -41,11 +43,23 @@ const styles = `
 
 /* Sidebar */
 .dtd-sidebar {
-    position: sticky;
-    top: 100px;
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+@media (min-width: 1200px) {
+    .dtd-sidebar {
+        position: sticky;
+        top: 90px;
+    }
+}
+.dtd-booking-form-wrap {
+    width: 100%;
+}
+.dtd-booking-form-wrap .bf-container {
+    max-width: 100%;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
 /* Widget 1: Need Assistance */
@@ -108,64 +122,65 @@ const styles = `
     background: #1ea952;
     transform: translateY(-2px);
 }
-
-/* Widget 2: City Routes */
-.dtd-routes-widget {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
-}
-.dtd-routes-header {
-    padding: 16px 20px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #0b2229;
-    border-bottom: 1px solid #e2e8f0;
-    margin: 0;
-    background: #ffffff;
-}
-.dtd-route-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 11px 20px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #334155;
-    text-decoration: none;
-    border-bottom: 1px solid #f1f5f9;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-.dtd-route-item:last-child {
-    border-bottom: none;
-}
-.dtd-route-item:hover {
-    background: #f8fafc;
-    color: var(--theme-color, #1ca8cb);
-}
-.dtd-route-chevron {
-    color: #94a3b8;
-    font-size: 11px;
-    transition: transform 0.2s ease;
-}
-.dtd-route-item:hover .dtd-route-chevron {
-    transform: translateX(3px);
-    color: var(--theme-color, #1ca8cb);
-}
 `;
+
+const resolveImg = (src) => {
+    if (!src) return '/assets/img/cabs/svc-oneway.jpg';
+    if (src.startsWith('http') || src.startsWith('data:')) return src;
+    const apiOrigin = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '') : '';
+    if (src.startsWith('/uploads')) return `${apiOrigin}${src}`;
+    return src.startsWith('/') ? src : `/${src}`;
+};
 
 function DropTaxiDetailPage() {
     const { id } = useParams();
 
-    // Find city by id, default to thoothukudi or first item
-    const city = dropTaxiCities.find(
-        (c) => c.id.toLowerCase() === (id || '').toLowerCase()
-    ) || dropTaxiCities.find(c => c.id === 'thoothukudi') || dropTaxiCities[0];
+    const [city, setCity] = useState(() => {
+        return dropTaxiCities.find(
+            (c) => c.id.toLowerCase() === (id || '').toLowerCase()
+        ) || dropTaxiCities.find(c => c.id === 'thoothukudi') || dropTaxiCities[0];
+    });
 
-    const aboutParagraphs = getCityAbout(city);
-    const routesList = getCityRoutes(city.name);
+    useEffect(() => {
+        if (!id) return;
+        let mounted = true;
+        api.get(`/drop-routes/${id}`)
+            .then(res => {
+                if (mounted && res && res.route) {
+                    setCity(prev => ({
+                        ...prev,
+                        id: res.route.cityId || id,
+                        name: res.route.cityName || res.route.title,
+                        title: res.route.title || `${res.route.cityName} Drop Taxi`,
+                        image: res.route.image || prev.image,
+                        bannerImage: res.route.bannerImage || res.route.image || prev.bannerImage,
+                        approxDistance: res.route.approxDistance || prev.approxDistance,
+                        approxTime: res.route.approxTime || prev.approxTime,
+                        sedanFare: res.route.sedanFare || prev.sedanFare,
+                        suvFare: res.route.suvFare || prev.suvFare,
+                        description: res.route.description || prev.description,
+                        aboutText: res.route.aboutText || prev.aboutText,
+                        routes: res.route.routes || prev.routes
+                    }));
+                }
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, [id]);
+
+    const aboutParagraphs = useMemo(() => {
+        if (city.aboutText && city.aboutText.trim()) {
+            return city.aboutText.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+        }
+        if (city.description && city.description.trim()) {
+            return [
+                city.description,
+                `Traveling to or from ${city.name} is made completely seamless with our professional one-way drop taxi service. Rather than paying double the fare for an empty return ride, our service charges only for the exact distance you ride, with doorstep pickup and verified polite drivers.`,
+                `Whether you need an early morning pickup for train or flight connections, an urgent hospital visit, or a relaxed journey with family, our clean AC hatchbacks, sedans, and SUVs are available 24/7.`
+            ];
+        }
+        return getCityAbout(city);
+    }, [city]);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -177,21 +192,21 @@ function DropTaxiDetailPage() {
             <HeaderOne />
             <Breadcrumb 
                 title={city.title} 
-                subtitle={`One-Way & Round-Trip Drop Taxi to/from ${city.name} • Starting from ${city.sedanFare}`}
-                bgImage={city.image || "/assets/img/cabs/svc-oneway.jpg"} 
+                subtitle={`One-Way & Round-Trip Drop Taxi to/from ${city.name} • Starting from ${city.sedanFare || '₹ 14 / km'}`}
+                bgImage={resolveImg(city.bannerImage || city.image)} 
             />
 
             <section className="dtd-section">
                 <div className="container">
                     <div className="row g-4 g-lg-5">
                         {/* LEFT COLUMN: Main Content matching user screenshot */}
-                        <div className="col-lg-8">
+                        <div className="col-lg-7 col-xl-8">
                             {/* 1. About City Block */}
                             <div className="dtd-block">
                                 <h3 className="dtd-title">About {city.name}</h3>
                                 <div>
                                     <img 
-                                        src={city.image} 
+                                        src={resolveImg(city.image)} 
                                         alt={city.title} 
                                         className="dtd-about-img" 
                                     />
@@ -239,16 +254,24 @@ function DropTaxiDetailPage() {
                                     Every traveller has unique requirements, and our extensive fleet of well-maintained vehicles is fully equipped to meet them all. For budget-conscious solo travelers or small families, we offer fuel-efficient and compact Hatchbacks such as the Swift and WagonR. These cars are perfect for quick runs and offer a cozy, air-conditioned ride at the lowest per-kilometer rates.
                                 </p>
                                 <p className="dtd-p">
-                                    If you require additional legroom and luggage space, our comfortable Sedans, including the Toyota Etios and Maruti Suzuki Dzire, provide an executive feel and smooth ride ideal for long-distance highway commutes. For larger families, group excursions, or corporate teams traveling together, we provide spacious and premium SUVs such as the Toyota Innova Crysta, Mahindra Xylo, and Ertiga, ensuring ample space for everyone and their belongings.
+                                    If you require additional legroom and luggage space, our comfortable Sedans, including the New Maruti Suzuki Swift Dzire and Hyundai Aura, provide an executive feel and smooth ride ideal for long-distance highway commutes. For larger families, group excursions, or corporate teams traveling together, we provide spacious and premium SUVs such as the Toyota Innova Crysta, Mahindra Xylo, and Ertiga, ensuring ample space for everyone and their belongings.
                                 </p>
 
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: Sidebar matching user screenshot */}
-                        <div className="col-lg-4">
+                        {/* RIGHT COLUMN: Sidebar with Booking Form & Need Assistance */}
+                        <div className="col-lg-5 col-xl-4">
                             <div className="dtd-sidebar">
-                                {/* Widget 1: Need Assistance? */}
+                                {/* Booking Form */}
+                                <div className="dtd-booking-form-wrap" style={{ width: '100%' }}>
+                                    <BookingForm 
+                                        initialTab="outstation" 
+                                        initialCity={city.name} 
+                                    />
+                                </div>
+
+                                {/* Widget: Need Assistance? */}
                                 <div className="dtd-help-widget">
                                     <h4 className="dtd-help-title">Need Assistance?</h4>
                                     <p className="dtd-help-desc">
@@ -267,26 +290,6 @@ function DropTaxiDetailPage() {
                                     >
                                         <i className="fab fa-whatsapp"></i> WhatsApp Live Chat
                                     </a>
-                                </div>
-
-                                {/* Widget 2: City Drop Taxi Routes */}
-                                <div className="dtd-routes-widget">
-                                    <h5 className="dtd-routes-header">
-                                        {city.name} Drop Taxi Routes
-                                    </h5>
-                                    <div>
-                                        {routesList.map((route, i) => (
-                                            <Link 
-                                                key={i} 
-                                                to="/contact" 
-                                                state={{ enquiry: { service: "One-Way Drop Taxi", route: route } }}
-                                                className="dtd-route-item"
-                                            >
-                                                <span>{route}</span>
-                                                <i className="fa-solid fa-chevron-right dtd-route-chevron"></i>
-                                            </Link>
-                                        ))}
-                                    </div>
                                 </div>
                             </div>
                         </div>

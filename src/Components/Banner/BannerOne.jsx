@@ -1,26 +1,66 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/swiper-bundle.css'; // Core Swiper styles
-import { Pagination, EffectFade, Navigation } from 'swiper/modules';
+import { Pagination, EffectFade, Navigation, Autoplay } from 'swiper/modules';
+
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/scrollbar';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
+
 import { telHref } from '../data/siteConfig';
 import { useBookingModal } from '../Booking/BookingModalContext';
 import usePublicContent from '../../services/usePublicContent';
+import { getApiOrigin } from '../../services/api';
+
 const originalBanners = [
-    { heading: 'Super Cabs – Your Trusted Taxi Partner', description: 'Safe, comfortable & on-time taxi service', image: '/assets/img/cabs/hero-1.jpg' },
-    { heading: 'Book Your Ride Anytime, Anywhere', description: 'Local, outstation & airport taxi', image: '/assets/img/cabs/hero-2.jpg' },
-    { heading: 'Travel Comfortably with Super Cabs', description: 'Corporate travel & tour packages', image: '/assets/img/cabs/hero-3.jpg' },
+    { 
+        heading: 'Super Cabs – Your Trusted Taxi Partner', 
+        description: 'Safe, comfortable & on-time taxi service across South India', 
+        image: '/assets/img/cabs/hero-1.jpg',
+        buttonLabel: 'Book Now',
+        buttonLink: '',
+        secondaryLabel: 'Call Now',
+        secondaryLink: ''
+    },
+    { 
+        heading: 'Book Your Ride Anytime, Anywhere', 
+        description: 'Local, outstation & airport taxi with transparent flat tariffs', 
+        image: '/assets/img/cabs/hero-2.jpg',
+        buttonLabel: 'Book Now',
+        buttonLink: '',
+        secondaryLabel: 'Call Now',
+        secondaryLink: ''
+    },
+    { 
+        heading: 'Travel Comfortably with Super Cabs', 
+        description: 'Corporate travel & tour packages with dedicated highway chauffeurs', 
+        image: '/assets/img/cabs/hero-3.jpg',
+        buttonLabel: 'Book Now',
+        buttonLink: '',
+        secondaryLabel: 'Call Now',
+        secondaryLink: ''
+    },
 ];
+
+const resolveBannerImage = (img, fallback = '/assets/img/cabs/hero-1.jpg') => {
+    if (!img) return fallback;
+    if (img.startsWith('http') || img.startsWith('data:')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads')) {
+        return `${getApiOrigin()}${img.startsWith('/') ? '' : '/'}${img}`;
+    }
+    return img;
+};
+
 function BannerOne() {
     const { openBookingModal } = useBookingModal();
     const swiperRef = useRef(null);
     const banners = usePublicContent('banner', originalBanners);
 
+    const activeBanners = (banners || []).filter((b) => b.isActive !== false);
+    const displayBanners = activeBanners.length > 0 ? activeBanners : originalBanners;
+
     useEffect(() => {
-        // Function to add animation classes
         const animationProperties = () => {
             document.querySelectorAll('[data-ani]').forEach((element) => {
                 const animationName = element.getAttribute('data-ani');
@@ -34,9 +74,8 @@ function BannerOne() {
         };
 
         animationProperties();
-    }, []);
+    }, [displayBanners]);
 
-    // Event handler for custom navigation arrows
     const handleSliderNavigation = (direction) => {
         if (swiperRef.current && swiperRef.current.swiper) {
             const swiper = swiperRef.current.swiper;
@@ -48,198 +87,136 @@ function BannerOne() {
         }
     };
 
+    const swiperKey = displayBanners
+        .map((b) => b.id || b._id || b.slug || b.heading)
+        .join('-');
+
     return (
         <div className="th-hero-wrapper hero-1" id="hero">
-
             <Swiper
-                modules={[Navigation, Pagination, EffectFade]} // Initialize necessary modules
-                effect="fade" // Use fade effect
-                loop={true} // Enable loop
+                key={swiperKey}
+                ref={swiperRef}
+                modules={[Navigation, Pagination, EffectFade, Autoplay]}
+                effect="fade"
+                loop={displayBanners.length > 1}
                 speed={1000}
+                autoplay={{
+                    delay: 5500,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
+                }}
+                observer={true}
+                observeParents={true}
                 pagination={{
-                    el: ".swiper-pagination", // Custom pagination container
-                    clickable: true, // Enable clickable pagination
+                    el: ".hero-slider-pagination",
+                    clickable: true,
                 }}
                 navigation={{
-                    nextEl: ".slider-next", // Custom next button
-                    prevEl: ".slider-prev", // Custom prev button
+                    nextEl: ".hero-slider-next",
+                    prevEl: ".hero-slider-prev",
                 }}
                 className="th-slider hero-slider-1"
                 id="heroSlide1"
             >
-                <div className="swiper-wrapper">
-                    {banners[0] && <SwiperSlide>
-                        <div className="hero-inner">
-                            <div
-                                className="th-hero-bg"
-                                style={{
-                                    backgroundImage: `url(${banners[0]?.image || originalBanners[0].image})`,
-                                    backgroundRepeat: "no-repeat",
-                                    backgroundSize: "cover",
-                                }}
-                            >
+                {displayBanners.map((banner, index) => {
+                    const bgUrl = resolveBannerImage(
+                        banner.image, 
+                        originalBanners[index % originalBanners.length].image
+                    );
+                    const headingText = banner.heading || banner.title || originalBanners[index % originalBanners.length].heading;
+                    const descText = banner.description || banner.subtitle || originalBanners[index % originalBanners.length].description;
+                    const btnLabel = banner.buttonLabel || 'Book Now';
+                    const btnLink = banner.buttonLink || '';
+                    const secLabel = banner.secondaryLabel || 'Call Now';
+                    const secLink = banner.secondaryLink || telHref();
 
-                            </div>
-                            <div className="container">
-                                <div className="hero-style1">
-                                    <span
-                                        className="sub-title style1"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.2s"
-                                    >
-                                        {banners[0]?.description || banners[0]?.subtitle || originalBanners[0].description}
-                                    </span>
-                                    <h1
-                                        className="hero-title"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.4s"
-                                    >
-                                        {banners[0]?.heading || banners[0]?.title || originalBanners[0].heading}
-                                    </h1>
-                                    <div
-                                        className="btn-group"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.6s"
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() => banners[0]?.buttonLink ? window.location.assign(banners[0].buttonLink) : openBookingModal()}
-                                            className="th-btn th-icon"
-                                            style={{ border: 'none', cursor: 'pointer' }}
+                    return (
+                        <SwiperSlide key={banner.id || banner._id || `banner-${index}`}>
+                            <div className="hero-inner">
+                                <div
+                                    className="th-hero-bg"
+                                    style={{
+                                        backgroundImage: `url(${bgUrl})`,
+                                        backgroundRepeat: "no-repeat",
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center center"
+                                    }}
+                                ></div>
+                                <div className="container">
+                                    <div className="hero-style1">
+                                        <span
+                                            className="sub-title style1"
+                                            data-ani="slideinup"
+                                            data-ani-delay="0.2s"
                                         >
-                                            {banners[0]?.buttonLabel || 'Book Now'}
-                                        </button>
-                                        <a href={telHref()} className="th-btn style2 th-icon">
-                                            Call Now
-                                        </a>
+                                            {descText}
+                                        </span>
+                                        <h1
+                                            className="hero-title"
+                                            data-ani="slideinup"
+                                            data-ani-delay="0.4s"
+                                        >
+                                            {headingText}
+                                        </h1>
+                                        <div
+                                            className="btn-group"
+                                            data-ani="slideinup"
+                                            data-ani-delay="0.6s"
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (btnLink) {
+                                                        if (btnLink.startsWith('http')) {
+                                                            window.location.assign(btnLink);
+                                                        } else {
+                                                            window.location.href = btnLink;
+                                                        }
+                                                    } else {
+                                                        openBookingModal();
+                                                    }
+                                                }}
+                                                className="th-btn th-icon"
+                                                style={{ border: 'none', cursor: 'pointer' }}
+                                            >
+                                                {btnLabel}
+                                            </button>
+                                            <a 
+                                                href={secLink} 
+                                                className="th-btn style2 th-icon"
+                                            >
+                                                {secLabel}
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </SwiperSlide>}
-                    {banners[1] && <SwiperSlide>
-                        <div className="hero-inner">
-                            <div
-                                className="th-hero-bg"
-                                style={{
-                                    backgroundImage: `url(${banners[1]?.image || originalBanners[1].image})`,
-                                    backgroundRepeat: "no-repeat",
-                                    backgroundSize: "cover",
-                                }}
-                            ></div>
-                            <div className="container">
-                                <div className="hero-style1">
-                                    <span
-                                        className="sub-title style1"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.2s"
-                                    >
-                                        {banners[1]?.description || banners[1]?.subtitle || originalBanners[1].description}
-                                    </span>
-                                    <h1
-                                        className="hero-title"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.4s"
-                                    >
-                                        {banners[1]?.heading || banners[1]?.title || originalBanners[1].heading}
-                                    </h1>
-                                    <div
-                                        className="btn-group"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.6s"
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() => banners[1]?.buttonLink ? window.location.assign(banners[1].buttonLink) : openBookingModal()}
-                                            className="th-btn th-icon"
-                                            style={{ border: 'none', cursor: 'pointer' }}
-                                        >
-                                            {banners[1]?.buttonLabel || 'Book Now'}
-                                        </button>
-                                        <a href={telHref()} className="th-btn style2 th-icon">
-                                            Call Now
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </SwiperSlide>}
-                    {banners[2] && <SwiperSlide>
-                        <div className="hero-inner">
-                            <div
-                                className="th-hero-bg"
-                                style={{
-                                    backgroundImage: `url(${banners[2]?.image || originalBanners[2].image})`,
-                                    backgroundRepeat: "no-repeat",
-                                    backgroundSize: "cover",
-                                }}
-                            ></div>
-                            <div className="container">
-                                <div className="hero-style1">
-                                    <span
-                                        className="sub-title style1"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.2s"
-                                    >
-                                        {banners[2]?.description || banners[2]?.subtitle || originalBanners[2].description}
-                                    </span>
-                                    <h1
-                                        className="hero-title"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.4s"
-                                    >
-                                        {banners[2]?.heading || banners[2]?.title || originalBanners[2].heading}
-                                    </h1>
-                                    <div
-                                        className="btn-group"
-                                        data-ani="slideinup"
-                                        data-ani-delay="0.6s"
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() => banners[2]?.buttonLink ? window.location.assign(banners[2].buttonLink) : openBookingModal()}
-                                            className="th-btn th-icon"
-                                            style={{ border: 'none', cursor: 'pointer' }}
-                                        >
-                                            {banners[2]?.buttonLabel || 'Book Now'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </SwiperSlide>}
-                    {banners.slice(3).map((banner, offset) => <SwiperSlide key={banner.id || `managed-${offset + 3}`}>
-                        <div className="hero-inner">
-                            <div className="th-hero-bg" style={{ backgroundImage: `url(${banner.image || originalBanners[(offset + 3) % originalBanners.length].image})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} />
-                            <div className="container"><div className="hero-style1">
-                                <span className="sub-title style1" data-ani="slideinup" data-ani-delay="0.2s">{banner.description || banner.subtitle}</span>
-                                <h1 className="hero-title" data-ani="slideinup" data-ani-delay="0.4s">{banner.heading || banner.title}</h1>
-                                <div className="btn-group" data-ani="slideinup" data-ani-delay="0.6s">
-                                    <button type="button" onClick={() => banner.buttonLink ? window.location.assign(banner.buttonLink) : openBookingModal()} className="th-btn th-icon" style={{ border: 'none', cursor: 'pointer' }}>{banner.buttonLabel || 'Book Now'}</button>
-                                </div>
-                            </div></div>
-                        </div>
-                    </SwiperSlide>)}
-                </div>
+                        </SwiperSlide>
+                    );
+                })}
+
                 <div className="th-swiper-custom">
                     <button
-                        className="slider-arrow slider-prev"
+                        className="slider-arrow slider-prev hero-slider-prev"
                         onClick={() => handleSliderNavigation("prev")}
+                        aria-label="Previous Slide"
+                        type="button"
                     >
                         <img src="/assets/img/icon/right-arrow.svg" alt="Prev" />
                     </button>
-                    <div className="swiper-pagination" /> {/* Pagination container */}
+                    <div className="swiper-pagination hero-slider-pagination" />
                     <button
-                        className="slider-arrow slider-next"
+                        className="slider-arrow slider-next hero-slider-next"
                         onClick={() => handleSliderNavigation("next")}
+                        aria-label="Next Slide"
+                        type="button"
                     >
                         <img src="/assets/img/icon/left-arrow.svg" alt="Next" />
                     </button>
                 </div>
             </Swiper>
         </div>
-
-    )
+    );
 }
 
-export default BannerOne
+export default BannerOne;

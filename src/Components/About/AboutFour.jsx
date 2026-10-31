@@ -2,12 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import siteConfig from '../data/siteConfig'
 import usePublicContent from '../../services/usePublicContent';
+import { getApiOrigin } from '../../services/api';
+
+const resolveImage = (img, fallback) => {
+   if (!img) return fallback;
+   if (img.startsWith('http')) return img;
+   if (img.startsWith('/uploads')) return `${getApiOrigin()}${img}`;
+   return img;
+};
 
 const features = [
    {
       title: 'Wide Range of Services',
       text: 'City rides, outstation, airport transfers and corporate packages.',
-      img: '/assets/img/cabs/cat-local.jpg',
+      img: '/assets/img/cabs/about-vision.jpg',
       icon: 'fa-route',
    },
    {
@@ -78,20 +86,19 @@ function AboutFour() {
             {/* ---------- Photos ---------- */}
             <div className="sc-photos">
                <figure className="sc-ph sc-ph--main">
-                  <img src={about?.image || '/assets/img/cabs/about-1.jpg'} alt={about?.alt || 'Super Cabs Fleet'} />
+                  <img src={resolveImage(about?.image, '/assets/img/cabs/about-1.jpg')} alt={about?.alt || 'Super Cabs Fleet'} />
                </figure>
                <figure className="sc-ph sc-ph--side">
-                  <img src="/assets/img/cabs/about-2.jpg" alt="Clean Taxi Interior" />
+                  <img src={resolveImage(about?.sideImage, '/assets/img/cabs/about-2.jpg')} alt="Toyota Innova Crysta MPV" />
                </figure>
                <figure className="sc-ph sc-ph--small">
-                  <img src="/assets/img/cabs/about-3.jpg" alt="Dedicated Support" />
+                  <img src={resolveImage(about?.smallImage, '/assets/img/cabs/about-3.jpg')} alt="Super Cabs Fleet Lineup" />
                </figure>
 
                <div className="sc-badge">
-
                   <span>
-                     <strong>{years}+ Years</strong>
-                     <small>Safe &amp; Trusted Trips</small>
+                     <strong>{about?.experienceYears || years}+ Years</strong>
+                     <small>{about?.badgeText || 'Safe & Trusted Trips'}</small>
                   </span>
                </div>
             </div>
@@ -105,7 +112,7 @@ function AboutFour() {
                   {about?.description || "At Super Cabs, our mission is to redefine outstation travel by providing highly reliable, safe, and pocket-friendly one way drop taxi services. We believe that travelers shouldn't have to pay double fare for one-way journeys. By offering dedicated drop taxi services across Tamil Nadu, Bangalore, and Pondicherry, we ensure that you only pay for the distance you actually travel. Our service is designed to offer maximum comfort and flexibility, whether you are booking a quick trip or a long-distance ride."}
                </p>
                <p className="sc-text">
-                  {about?.fleetDescription || 'We take pride in our diverse and well-maintained fleet, catering to all your travel requirements. From fuel-efficient hatchbacks and comfortable sedans like Etios and Dzire, to spacious SUVs and premium vehicles like Innova and Crysta, we have the perfect ride for every occasion. We operate heavily across major routes, including the highly requested Chennai to Bangalore taxi, Chennai to Trichy taxi, Chennai to Madurai taxi, Chennai to Coimbatore taxi, Chennai to Salem taxi, and Chennai to Pondicherry taxi. Each ride is optimized for safety and convenience, ensuring a smooth travel experience.'}
+                  {about?.fleetDescription || 'We take pride in our diverse and well-maintained fleet, catering to all your travel requirements. From fuel-efficient hatchbacks and comfortable sedans like the New Swift Dzire and Aura, to spacious SUVs and premium vehicles like Innova and Crysta, we have the perfect ride for every occasion. We operate heavily across major routes, including the highly requested Chennai to Bangalore taxi, Chennai to Trichy taxi, Chennai to Madurai taxi, Chennai to Coimbatore taxi, Chennai to Salem taxi, and Chennai to Pondicherry taxi. Each ride is optimized for safety and convenience, ensuring a smooth travel experience.'}
                </p>
                <p className="sc-text">
                   {about?.secondaryDescription || 'Safety and transparency are the core pillars of Super Cabs. All our drivers are thoroughly verified, highly experienced, and familiar with highways across South India, guaranteeing a secure trip. We offer a 100% transparent billing system with absolutely zero hidden fees, GST, or driver beta surprises. With our round-the-clock 24/7 customer booking and dispatch support, we ensure that help is always just a phone call away. Choose us for your next journey and experience the premier standard in drop taxi travel.'}

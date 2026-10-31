@@ -45,6 +45,17 @@ function MobileMenu({ isOpen, onClose }) {
                             Book Now
                         </button>
                     </div>
+                    <div style={{ padding: '16px 20px 10px', fontSize: '12px', color: '#64748b', textAlign: 'center' }}>
+                        <div style={{ fontWeight: '700', color: 'var(--theme-color, #1ca8cb)', marginBottom: '4px' }}>
+                            <i className="fa-solid fa-car-side" /> Service Available:
+                        </div>
+                        <div style={{ fontWeight: '600', color: '#334155', marginBottom: '8px' }}>
+                            * Tamilnadu &nbsp;* Karnataka &nbsp;* Pudhuchery
+                        </div>
+                        <div style={{ fontSize: '11px' }}>
+                            <i className="fa-regular fa-location-dot" /> {siteConfig.address}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

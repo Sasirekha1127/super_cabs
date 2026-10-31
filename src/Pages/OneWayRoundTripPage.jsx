@@ -6,15 +6,22 @@ import ScrollToTop from '../Components/ScrollToTop';
 import Breadcrumb from '../Components/BreadCrumb/Breadcrumb';
 import DropTaxiGrid from '../Components/Services/DropTaxiGrid';
 import siteConfig, { telHref, waHref } from '../Components/data/siteConfig';
+import usePublicContent from '../services/usePublicContent';
 
 function OneWayRoundTripPage() {
+    const services = usePublicContent('service');
+    const oneWay = services.find(s => s.slug === 'oneway-roundtrip');
+    const title = oneWay?.title || "One-Way Drop Taxi";
+    const subtitle = oneWay?.shortDesc || oneWay?.description || "Pay Strictly For Single Direction Travel • Zero Return Fare Across All Tamil Nadu & South India Districts";
+    const bgImage = oneWay?.image || "/assets/img/cabs/svc-oneway.jpg";
+
     return (
         <>
             <HeaderOne />
             <Breadcrumb 
-                title="One-Way Drop Taxi" 
-                subtitle="Pay Strictly For Single Direction Travel • Zero Return Fare Across All Tamil Nadu & South India Districts"
-                bgImage="/assets/img/cabs/svc-oneway.jpg" 
+                title={title} 
+                subtitle={subtitle}
+                bgImage={bgImage} 
             />
 
             {/* Value Proposition Highlights Banner */}

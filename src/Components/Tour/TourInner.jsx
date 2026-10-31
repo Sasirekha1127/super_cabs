@@ -69,8 +69,8 @@ function TourInner() {
 
                 {/* Tour Cards Grid */}
                 <div className="row gy-24 gx-24">
-                    {dynamicTours.map((t) => (
-                        <div key={t.id} className="col-xl-4 col-md-6">
+                    {dynamicTours.map((t, idx) => (
+                        <div key={t.slug || t.id || t._id || idx} className="col-xl-4 col-md-6">
                             <TourCard tour={t} />
                         </div>
                     ))}

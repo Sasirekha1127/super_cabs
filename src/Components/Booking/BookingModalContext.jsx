@@ -6,7 +6,7 @@ export function BookingModalProvider({ children }) {
     const [isOpen, setIsOpen] = useState(false);
     const [modalData, setModalData] = useState({
         tab: 'outstation', // 'outstation' | 'rental' | 'airport'
-        city: 'Chennai',
+        city: '',
         vehicle: '',
         from: '',
         to: '',
@@ -14,10 +14,15 @@ export function BookingModalProvider({ children }) {
     });
 
     const openBookingModal = (initialData = {}) => {
-        setModalData((prev) => ({
-            ...prev,
+        setModalData({
+            tab: 'outstation',
+            city: '',
+            vehicle: '',
+            from: '',
+            to: '',
+            tripType: '',
             ...initialData
-        }));
+        });
         setIsOpen(true);
     };
 

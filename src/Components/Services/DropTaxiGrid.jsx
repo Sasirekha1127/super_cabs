@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { dropTaxiCities } from '../data/dropTaxiData';
+import { dropTaxiCities as fallbackCities } from '../data/dropTaxiData';
+import api from '../../services/api';
 
 const styles = `
 .dt-section {
@@ -166,18 +167,57 @@ const styles = `
 }
 `;
 
+const resolveImg = (src) => {
+    if (!src) return '/assets/img/cabs/svc-oneway.jpg';
+    if (src.startsWith('http') || src.startsWith('data:')) return src;
+    const apiOrigin = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '') : '';
+    if (src.startsWith('/uploads')) return `${apiOrigin}${src}`;
+    return src.startsWith('/') ? src : `/${src}`;
+};
+
 function DropTaxiGrid() {
+    const [cities, setCities] = useState(fallbackCities);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCat, setSelectedCat] = useState('all');
 
+    useEffect(() => {
+        let mounted = true;
+        api.get('/drop-routes')
+            .then(res => {
+                if (mounted && res && res.routes && res.routes.length > 0) {
+                    const mapped = res.routes.map(r => ({
+                        id: r.cityId || r._id,
+                        name: r.cityName || r.title,
+                        title: r.title || `${r.cityName} Drop Taxi`,
+                        image: r.image || '/assets/img/cabs/svc-oneway.jpg',
+                        category: r.category === 'hill' ? 'hillstation' : r.category || 'major',
+                        approxDistance: r.approxDistance || '',
+                        approxTime: r.approxTime || '',
+                        sedanFare: r.sedanFare || '',
+                        suvFare: r.suvFare || '',
+                        description: r.description || ''
+                    }));
+                    setCities(mapped);
+                }
+            })
+            .catch(() => {
+                // Keep fallbackCities on error
+            });
+        return () => { mounted = false; };
+    }, []);
+
     const filteredCities = useMemo(() => {
-        return dropTaxiCities.filter((city) => {
-            const matchesSearch = city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                  city.title.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = selectedCat === 'all' || city.category === selectedCat;
+        return cities.filter((city) => {
+            const name = city.name || '';
+            const title = city.title || '';
+            const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                  title.toLowerCase().includes(searchTerm.toLowerCase());
+            const cat = city.category === 'hill' ? 'hillstation' : (city.category || 'major');
+            const targetCat = selectedCat === 'hill' ? 'hillstation' : selectedCat;
+            const matchesCategory = targetCat === 'all' || cat === targetCat;
             return matchesSearch && matchesCategory;
         });
-    }, [searchTerm, selectedCat]);
+    }, [cities, searchTerm, selectedCat]);
 
     return (
         <section className="dt-section space">
@@ -202,7 +242,7 @@ function DropTaxiGrid() {
                         className={`dt-pill ${selectedCat === 'all' ? 'active' : ''}`}
                         onClick={() => setSelectedCat('all')}
                     >
-                        All Routes ({dropTaxiCities.length})
+                        All Routes ({cities.length})
                     </button>
                     <button 
                         type="button" 
@@ -240,7 +280,7 @@ function DropTaxiGrid() {
                         <div key={city.id} className="col-lg-6 col-md-6">
                             <div className="dt-card">
                                 <Link to={`/drop-taxi/${city.id}`} className="dt-img-wrap d-block">
-                                    <img src={city.image} alt={city.title} />
+                                    <img src={resolveImg(city.image)} alt={city.title} />
                                 </Link>
                                 <div className="dt-body">
                                     <h4 className="dt-title">

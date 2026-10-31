@@ -1,9 +1,10 @@
 import React from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
+import usePublicContent from "../../services/usePublicContent";
 
-// progress = how far the gauge ring fills (0 to 1) - purely visual
-const counters = [
+// Fallback counters if not yet configured in admin
+const defaultCounters = [
     { value: 24, suffix: "/7", title: "Booking Support", icon: "fa-headset", progress: 1 },
     { value: 6, suffix: "", title: "Taxi Services", icon: "fa-taxi", progress: 0.75 },
     { value: 6, suffix: "", title: "Vehicle Types", icon: "fa-car-side", progress: 0.75 },
@@ -16,6 +17,11 @@ const CIRC = 2 * Math.PI * R;
 const CounterOne = () => {
     // triggerOnce is false so everything replays each time the section scrolls into view
     const { ref, inView } = useInView({ threshold: 0.3 });
+    const msData = usePublicContent('about', []).find(item => item.slug === 'milestones')?.data;
+
+    const subheading = msData?.subheading || "Company Highlights";
+    const heading = msData?.heading || "Our Fleet & Service Milestones";
+    const counterList = Array.isArray(msData?.counters) && msData.counters.length > 0 ? msData.counters : defaultCounters;
 
     return (
         <div
@@ -32,46 +38,51 @@ const CounterOne = () => {
 
             <div className="container position-relative">
                 <div className="scc-head text-center">
-                    <span className="scc-pill">Company Highlights</span>
-                    <h2 className="scc-title">Our Fleet &amp; Service Milestones</h2>
+                    <span className="scc-pill">{subheading}</span>
+                    <h2 className="scc-title">{heading}</h2>
                     <span className="scc-bar"></span>
                 </div>
 
                 <div className="scc-grid">
-                    {counters.map((c, i) => (
-                        <div className="scc-card" key={c.title} style={{ "--i": i }}>
-                            <div className="scc-gauge">
-                                <svg viewBox="0 0 120 120" className="scc-svg" aria-hidden="true">
-                                    <circle className="scc-track" cx="60" cy="60" r={R} />
-                                    <circle
-                                        className="scc-fill"
-                                        cx="60"
-                                        cy="60"
-                                        r={R}
-                                        style={{
-                                            strokeDasharray: CIRC,
-                                            strokeDashoffset: inView ? CIRC * (1 - c.progress) : CIRC
-                                        }}
-                                    />
-                                </svg>
-                                <span className="scc-ticks"></span>
-                                <div className="scc-num">
-                                    <strong>
-                                        {inView ? (
-                                            <CountUp key="on" start={0} end={c.value} duration={2} />
-                                        ) : (
-                                            0
-                                        )}
-                                        {c.suffix}
-                                    </strong>
+                    {counterList.map((c, i) => {
+                        const numVal = Number(c.value) || 0;
+                        const progressVal = Number(c.progress) || 0.85;
+
+                        return (
+                            <div className="scc-card" key={c.title || i} style={{ "--i": i }}>
+                                <div className="scc-gauge">
+                                    <svg viewBox="0 0 120 120" className="scc-svg" aria-hidden="true">
+                                        <circle className="scc-track" cx="60" cy="60" r={R} />
+                                        <circle
+                                            className="scc-fill"
+                                            cx="60"
+                                            cy="60"
+                                            r={R}
+                                            style={{
+                                                strokeDasharray: CIRC,
+                                                strokeDashoffset: inView ? CIRC * (1 - progressVal) : CIRC
+                                            }}
+                                        />
+                                    </svg>
+                                    <span className="scc-ticks"></span>
+                                    <div className="scc-num">
+                                        <strong>
+                                            {inView ? (
+                                                <CountUp key="on" start={0} end={numVal} duration={2} />
+                                            ) : (
+                                                0
+                                            )}
+                                            {c.suffix}
+                                        </strong>
+                                    </div>
+                                    <span className="scc-icon">
+                                        <i className={`fa-solid ${c.icon || "fa-award"}`}></i>
+                                    </span>
                                 </div>
-                                <span className="scc-icon">
-                                    <i className={`fa-solid ${c.icon}`}></i>
-                                </span>
+                                <h6 className="scc-label">{c.title}</h6>
                             </div>
-                            <h6 className="scc-label">{c.title}</h6>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

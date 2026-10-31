@@ -5,6 +5,7 @@ import ScrollToTop from '../Components/ScrollToTop'
 import Breadcrumb from '../Components/BreadCrumb/Breadcrumb'
 import GetInTouch from '../Components/Contact/GetInTouch'
 import BookATour from '../Components/Contact/BookATour'
+import ContactForm from '../Components/Contact/ContactForm'
 import ContactMap from '../Components/Contact/ContactMap'
 
 function Contact() {
@@ -17,6 +18,7 @@ function Contact() {
                 bgImage="/assets/img/cabs/hero-3.jpg" 
             />
             <GetInTouch />
+            <ContactForm />
             <BookATour />
             <ContactMap />
             <FooterFour />

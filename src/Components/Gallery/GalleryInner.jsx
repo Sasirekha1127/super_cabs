@@ -4,8 +4,18 @@ import { galleryItems } from '../data/cabsData';
 import usePublicContent from '../../services/usePublicContent';
 import siteConfig, { telHref, waHref } from '../data/siteConfig';
 import { Link } from 'react-router-dom';
+import { getApiOrigin } from '../../services/api';
 
-const categories = [
+const resolveImageUrl = (img, fallback = '/assets/img/cabs/sedan.jpg') => {
+    if (!img) return fallback;
+    if (img.startsWith('http') || img.startsWith('data:')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads')) {
+        return `${getApiOrigin()}${img.startsWith('/') ? '' : '/'}${img}`;
+    }
+    return img;
+};
+
+const baseCategories = [
     { key: "all", label: "All Photos" },
     { key: "vehicles", label: "Taxi & Vehicles" },
     { key: "tours", label: "Tour & Travel" },
@@ -185,11 +195,35 @@ function GalleryInner() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [active, setActive] = useState('all');
-    const galleryCategories = [...categories, ...[...new Set(dynamicGallery.map(item => item.cat).filter(Boolean))]
-        .filter(key => !categories.some(category => category.key === key))
-        .map(key => ({ key, label: key.replace(/[-_]/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()) }))];
 
-    const items = active === 'all' ? dynamicGallery : dynamicGallery.filter((g) => g.cat === active);
+    const normalizeCatKey = (rawCat) => {
+        if (!rawCat) return 'vehicles';
+        const c = String(rawCat).toLowerCase().trim();
+        if (c === 'vehicles' || c === 'tours' || c === 'service') return c;
+        if (c.includes('taxi') || c.includes('fleet') || c.includes('sedan') || c.includes('suv')) return 'vehicles';
+        if (c.includes('tour') || c.includes('travel') || c.includes('sightseeing')) return 'tours';
+        if (c.includes('customer') || c.includes('airport')) return 'service';
+        return c.replace(/[^a-z0-9]+/g, '-');
+    };
+
+    const getItemCat = (item) => normalizeCatKey(item.cat || item.category);
+    const getItemSrc = (item) => item.src || item.image || '';
+
+    // Dynamic categories including any custom ones
+    const customKeys = [...new Set(dynamicGallery.map(getItemCat).filter(Boolean))]
+        .filter(key => !baseCategories.some(bc => bc.key === key));
+
+    const galleryCategories = [
+        ...baseCategories,
+        ...customKeys.map(key => ({
+            key,
+            label: key.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        }))
+    ];
+
+    const items = active === 'all' 
+        ? dynamicGallery 
+        : dynamicGallery.filter((g) => getItemCat(g) === active);
 
     const openModalAtIndex = (idx, event) => {
         if (event) {
@@ -212,7 +246,7 @@ function GalleryInner() {
 
     const getCount = (key) => {
         if (key === 'all') return dynamicGallery.length;
-        return dynamicGallery.filter((g) => g.cat === key).length;
+        return dynamicGallery.filter((g) => getItemCat(g) === key).length;
     };
 
     const galleryHighlights = [
@@ -298,16 +332,48 @@ function GalleryInner() {
                 {/* Gallery Cards Grid */}
                 <div className="row gy-4">
                     {items.map((g, index) => (
-                        <div key={g.id || g.src} className="col-lg-4 col-md-6">
+                        <div key={g.id || g._id || getItemSrc(g)} className="col-lg-4 col-md-6">
                             <div 
                                 className="gl-card" 
                                 style={{ cursor: 'pointer' }}
                                 onClick={(e) => openModalAtIndex(index, e)}
                             >
-                                <img src={g.src} alt={g.alt || g.title || "Super Cabs gallery"} className="gl-img" />
+                                <img 
+                                    src={resolveImageUrl(getItemSrc(g))} 
+                                    alt={g.alt || g.title || "Super Cabs gallery"} 
+                                    className="gl-img" 
+                                    onError={(e) => {
+                                        e.target.src = '/assets/img/cabs/sedan.jpg';
+                                    }}
+                                />
                                 <div className="gl-overlay">
                                     <div className="d-flex justify-content-between align-items-center w-100">
-                                        <span className="gl-tag">{g.tag}</span>
+                                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                                            <span className="gl-tag">{g.tag || 'Super Cabs'}</span>
+                                            {g.regNo && (
+                                                <span 
+                                                    style={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        background: '#facc15',
+                                                        color: '#000000',
+                                                        padding: '2px 8px',
+                                                        borderRadius: '4px',
+                                                        fontWeight: '800',
+                                                        fontSize: '11px',
+                                                        letterSpacing: '0.6px',
+                                                        border: '1.5px solid #000000',
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                                                        textTransform: 'uppercase'
+                                                    }}
+                                                    title="Tamil Nadu Commercial Taxi Registration"
+                                                >
+                                                    <span style={{ fontSize: '8px', fontWeight: '900', borderRight: '1px solid #000', paddingRight: '4px', opacity: 0.85 }}>IND</span>
+                                                    <span>{g.regNo}</span>
+                                                </span>
+                                            )}
+                                        </div>
                                         <button
                                             type="button"
                                             className="gl-zoom-btn"
@@ -318,8 +384,8 @@ function GalleryInner() {
                                         </button>
                                     </div>
                                     <div>
-                                        <h4 className="gl-title">{g.title}</h4>
-                                        <p className="gl-subtitle">{g.subtitle}</p>
+                                        <h4 className="gl-title">{g.title || 'Super Cabs Moment'}</h4>
+                                        <p className="gl-subtitle">{g.subtitle || g.description || 'Verified chauffeur and sanitised cab service'}</p>
                                         <div className="gl-bottom-actions" onClick={(e) => e.stopPropagation()}>
                                             <Link 
                                                 to="/contact" 

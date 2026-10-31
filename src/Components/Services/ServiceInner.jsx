@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import siteConfig, { telHref, waHref } from '../data/siteConfig';
 import { services as defaultServices } from '../data/cabsData';
 import usePublicContent from '../../services/usePublicContent';
+import ServiceCard from './ServiceCard';
 
 const css = `
 .sv-section {
@@ -282,8 +283,10 @@ function ServiceInner() {
     const getService = slug => managedServices.find(item => item.slug === slug);
     const oneWay = getService('oneway-roundtrip');
     const local = getService('local');
+    const outstation = getService('outstation');
     const airport = getService('airport');
     const corporate = getService('corporate');
+    const otherServices = managedServices.filter(item => !['oneway-roundtrip', 'local', 'outstation', 'airport', 'corporate'].includes(item.slug));
     return (
         <section className="position-relative overflow-hidden space sv-section" id="taxi-services-sec">
             <style>{css}</style>
@@ -329,8 +332,8 @@ function ServiceInner() {
                                     <div className="sv-featured-img-wrap">
                                         <Link to="/services/one-way-round-trip" className="d-block w-100 h-100">
                                             <img 
-                                                src="/assets/img/cabs/svc-oneway.jpg" 
-                                                alt="One-Way and Round-Trip Outstation Taxi" 
+                                                src={oneWay?.image || "/assets/img/cabs/svc-oneway.jpg"} 
+                                                alt={oneWay?.title || "One-Way and Round-Trip Outstation Taxi"} 
                                                 className="sv-featured-img" 
                                             />
                                             <div className="sv-featured-overlay">
@@ -357,7 +360,7 @@ function ServiceInner() {
                                                     borderRadius: '12px'
                                                 }}
                                             >
-                                                Pay Single or Return
+                                                {oneWay?.tag || 'Pay Single or Return'}
                                             </span>
                                             <span className="text-muted" style={{ fontSize: '12px' }}>
                                                 • Instant Confirmation
@@ -464,13 +467,13 @@ function ServiceInner() {
                 {/* ROW 2: Drop Taxi & One Way Taxi + Local Rental Cabs + Airport Transfers (Matching Reference Image) */}
                 <div className="row gy-4 mb-4">
                     {/* 1. DROP TAXI & ONE WAY TAXI (Outstation) */}
-                    <div className="col-lg-4 col-md-6" style={!local ? { display: 'none' } : undefined}>
+                    <div className="col-lg-4 col-md-6" style={!outstation ? { display: 'none' } : undefined}>
                         <div className="sv-standard-card">
                             <div className="sv-img-holder">
-                                <Link to="/contact" state={{ enquiry: { service: "Drop Taxi & One Way Taxi" } }}>
-                                    <img src="/assets/img/cabs/svc-outstation.jpg" alt="Drop Taxi & One Way Taxi" />
+                                <Link to="/contact" state={{ enquiry: { service: outstation?.title || "Drop Taxi & One Way Taxi" } }}>
+                                    <img src={outstation?.image || "/assets/img/cabs/svc-outstation.jpg"} alt={outstation?.title || "Drop Taxi & One Way Taxi"} />
                                 </Link>
-                                <span className="sv-badge-tag" style={{ background: '#059669' }}>Intercity &amp; Drop Taxi</span>
+                                <span className="sv-badge-tag" style={{ background: '#059669' }}>{outstation?.tag || 'Intercity & Drop Taxi'}</span>
                             </div>
 
                             <div className="sv-card-content">
@@ -479,13 +482,13 @@ function ServiceInner() {
                                 </div>
 
                                 <h4 className="sv-card-title">
-                                    <Link to="/contact" state={{ enquiry: { service: "Drop Taxi & One Way Taxi" } }}>
-                                        DROP TAXI &amp; ONE WAY TAXI
+                                    <Link to="/contact" state={{ enquiry: { service: outstation?.title || "Drop Taxi & One Way Taxi" } }}>
+                                        {outstation?.title || 'DROP TAXI & ONE WAY TAXI'}
                                     </Link>
                                 </h4>
 
                                 <p className="sv-card-desc">
-                                    Book a premium <strong>one way taxi</strong> or <strong>drop taxi</strong> for your outstation travel. We specialize in providing reliable point-to-point drop services across South India. Save money by paying only for the distance traveled.
+                                    {outstation?.description || 'Book a premium one way taxi or drop taxi for your outstation travel. We specialize in providing reliable point-to-point drop services across South India. Save money by paying only for the distance traveled.'}
                                 </p>
 
                                 <div className="mt-auto pt-2">
@@ -662,6 +665,25 @@ function ServiceInner() {
                         </div>
                     </div>
                 </div>
+
+                {/* Additional Services Dynamic Grid */}
+                {otherServices.length > 0 && (
+                    <div className="row gy-4 mt-2 mb-4">
+                        {otherServices.map((svc) => (
+                            <div key={svc.slug || svc.id} className="col-lg-4 col-md-6">
+                                <ServiceCard 
+                                    slug={svc.slug}
+                                    title={svc.title}
+                                    text={svc.description || svc.text}
+                                    image={svc.image}
+                                    tag={svc.tag}
+                                    icon={svc.icon}
+                                    features={svc.features}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

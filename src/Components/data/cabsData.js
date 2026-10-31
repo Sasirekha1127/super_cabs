@@ -98,7 +98,7 @@ export const vehicles = [
     name: "Comfort Sedan", 
     image: "/assets/img/cabs/sedan.jpg",
     tag: "Most Popular",
-    models: "Maruti Dzire, Toyota Etios, Hyundai Aura",
+    models: "New Maruti Swift Dzire, Hyundai Aura, Honda Amaze",
     seats: "4 Passengers + 1 Driver", 
     seatingCapacity: 4,
     luggage: "3 Large Bags + Handbags",
@@ -293,7 +293,7 @@ export const tours = [
         startingFare: "₹ 2,499 (Sedan All-Inclusive)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 2,499",
                 "tag": "Most Popular",
@@ -379,7 +379,7 @@ export const tours = [
         startingFare: "₹ 5,499 (Sedan 2 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 5,499",
                 "tag": "Most Popular",
@@ -466,7 +466,7 @@ export const tours = [
         startingFare: "₹ 6,999 (Sedan 2 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 6,999",
                 "tag": "Most Popular",
@@ -553,7 +553,7 @@ export const tours = [
         startingFare: "₹ 5,799 (Sedan 2 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 5,799",
                 "tag": "Most Popular",
@@ -648,7 +648,7 @@ export const tours = [
         startingFare: "₹ 10,499 (Sedan 3 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 10,499",
                 "tag": "Most Popular",
@@ -743,7 +743,7 @@ export const tours = [
         startingFare: "₹ 9,899 (Sedan 3 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 9,899",
                 "tag": "Most Popular",
@@ -848,7 +848,7 @@ export const tours = [
         startingFare: "₹ 13,999 (Sedan 4 Days)",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "₹ 13,999",
                 "tag": "Economy",
@@ -940,7 +940,7 @@ export const tours = [
         startingFare: "Custom Quote",
     vehiclePricing: [
           {
-                "vehicle": "AC Sedan (Dzire / Etios)",
+                "vehicle": "AC Sedan (New Swift Dzire / Aura)",
                 "seats": "4 Passengers",
                 "price": "Custom Quote",
                 "tag": "Economy",
@@ -978,15 +978,98 @@ export const testimonials = [
 ];
 
 export const galleryItems = [
-  // Taxi / Vehicle Photos
-  { id: 1, cat: "vehicles", tag: "Sedan", title: "Comfort Sedan Cab", subtitle: "Dzire / Etios • Most Popular for Outstation", src: "/assets/img/cabs/sedan.jpg" },
-  { id: 2, cat: "vehicles", tag: "SUV", title: "Spacious Family SUV", subtitle: "Ertiga / Innova • 6-Seater Family Comfort", src: "/assets/img/cabs/suv.jpg" },
+  // Taxi / Vehicle Photos with TN Commercial Registration Numbers
+  { 
+    id: 1, 
+    cat: "vehicles", 
+    tag: "Sedan", 
+    regNo: "TN 38 BT 4723",
+    title: "New Maruti Swift Dzire", 
+    subtitle: "TN 38 BT 4723 • Latest Model • Chilled AC & Sanitised Cabin", 
+    src: "/assets/img/cabs/sedan.jpg" 
+  },
+  { 
+    id: 2, 
+    cat: "vehicles", 
+    tag: "SUV", 
+    regNo: "TN 66 AX 2026",
+    title: "Toyota Innova Crysta Luxury", 
+    subtitle: "TN 66 AX 2026 • 7-Seater Luxury AC • Outstation & Hill Tours", 
+    src: "/assets/img/cabs/suv.jpg" 
+  },
+  { 
+    id: 3, 
+    cat: "vehicles", 
+    tag: "Family MPV", 
+    regNo: "TN 99 CJ 9876",
+    title: "Maruti Ertiga Prime", 
+    subtitle: "TN 99 CJ 9876 • 6-Seater Family Comfort • Smooth Highway Ride", 
+    src: "/assets/img/cabs/fleet-mpv.jpg" 
+  },
+  { 
+    id: 4, 
+    cat: "vehicles", 
+    tag: "Hatchback", 
+    regNo: "TN 38 CJ 1723",
+    title: "Compact Swift Hatchback", 
+    subtitle: "TN 38 CJ 1723 • Economical & Swift City / Airport Rides", 
+    src: "/assets/img/cabs/hatchback.jpg" 
+  },
+  { 
+    id: 5, 
+    cat: "vehicles", 
+    tag: "Tempo Traveller", 
+    regNo: "TN 01 BK 5417",
+    title: "Luxury Tempo Traveller", 
+    subtitle: "TN 01 BK 5417 • 14-Seater AC • Pushback Seats for Family Tours", 
+    src: "/assets/img/cabs/tempo-traveller.jpg" 
+  },
+  { 
+    id: 6, 
+    cat: "vehicles", 
+    tag: "Executive", 
+    regNo: "TN 37 DH 1122",
+    title: "Executive Luxury Sedan", 
+    subtitle: "TN 37 DH 1122 • Corporate & VIP Airport Chauffeur Service", 
+    src: "/assets/img/cabs/premium-sedan.jpg" 
+  },
 
   // Tour Photos
-  { id: 3, cat: "tours", tag: "Hill Station", title: "Misty Mountain Getaway", subtitle: "Ooty & Kodaikanal Scenic Viewpoints & Tea Valleys", src: "/assets/img/cabs/tour-hillstation.jpg" },
-  { id: 4, cat: "tours", tag: "Pilgrimage", title: "Sacred Temple Circuit", subtitle: "Meenakshi Amman & Rameswaram Coastal Shrines", src: "/assets/img/cabs/tour-temple.jpg" },
+  { 
+    id: 7, 
+    cat: "tours", 
+    tag: "Hill Station", 
+    regNo: "TN 38 BT 4723",
+    title: "Misty Mountain Getaway", 
+    subtitle: "TN 38 BT 4723 • Ooty & Kodaikanal Scenic Ghat-Road Drives", 
+    src: "/assets/img/cabs/tour-hillstation.jpg" 
+  },
+  { 
+    id: 8, 
+    cat: "tours", 
+    tag: "Pilgrimage", 
+    regNo: "TN 66 AX 2026",
+    title: "Sacred Temple Circuit", 
+    subtitle: "TN 66 AX 2026 • Madurai Meenakshi & Rameswaram Coastal Shrines", 
+    src: "/assets/img/cabs/tour-temple.jpg" 
+  },
 
   // Customer / Service Photos
-  { id: 5, cat: "service", tag: "Sanitised Cab", title: "100% Cleaned & Sanitised Cabin", subtitle: "Fresh Interiors Prepared Before Every Trip", src: "/assets/img/cabs/about-2.jpg" },
-  { id: 6, cat: "service", tag: "Airport Service", title: "On-Time Airport Terminal Drop", subtitle: "Punctual Pickup with Zero Flight Delay Worries", src: "/assets/img/cabs/cat-airport.jpg" },
+  { 
+    id: 9, 
+    cat: "service", 
+    tag: "Sanitised Cab", 
+    title: "100% Cleaned & Sanitised Cabin", 
+    subtitle: "Deep Cleaned, Odour-Free AC Interiors Prepared Before Every Trip", 
+    src: "/assets/img/cabs/about-2.jpg" 
+  },
+  { 
+    id: 10, 
+    cat: "service", 
+    tag: "Airport Service", 
+    regNo: "TN 38 BT 4723",
+    title: "On-Time Airport Terminal Drop", 
+    subtitle: "TN 38 BT 4723 • Punctual 24/7 Doorstep Transfers to Airports", 
+    src: "/assets/img/cabs/cat-airport.jpg" 
+  },
 ];

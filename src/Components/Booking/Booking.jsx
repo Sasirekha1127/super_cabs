@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NiceSelect from "../Header/NiceSelect";
+import { fetchCabs } from "../../services/bookingService";
 
 function Booking() {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ function Booking() {
         { value: "Corporate Taxi", label: "Corporate Taxi" },
         { value: "Tour Package", label: "Tour Package" },
     ];
-    const vehicleOptions = [
+    const defaultVehicleOptions = [
         { value: "Hatchback", label: "Hatchback" },
         { value: "Sedan", label: "Sedan" },
         { value: "Premium Sedan", label: "Premium Sedan" },
@@ -22,6 +23,21 @@ function Booking() {
         { value: "MPV / 7-Seater", label: "MPV / 7-Seater" },
         { value: "Tempo Traveller", label: "Tempo Traveller" },
     ];
+    const [vehiclesList, setVehiclesList] = useState(defaultVehicleOptions);
+
+    useEffect(() => {
+        fetchCabs().then((cabs) => {
+            if (Array.isArray(cabs) && cabs.length > 0) {
+                const activeOnly = cabs.filter(c => c.isActive !== false);
+                if (activeOnly.length > 0) {
+                    setVehiclesList(activeOnly.map(c => ({
+                        value: c.name,
+                        label: `${c.name} (${c.rateOneWay || '₹ 15/km'})`
+                    })));
+                }
+            }
+        }).catch(() => {});
+    }, []);
     const tripOptions = [
         { value: "One-Way", label: "One-Way" },
         { value: "Round-Trip", label: "Round-Trip" },
@@ -68,7 +84,7 @@ function Booking() {
                                 </div>
                                 <div className="search-input">
                                     <label>Vehicle</label>
-                                    <NiceSelect options={vehicleOptions} defaultValue="Select Vehicle" onChange={(v) => handleChange("vehicle", v)} />
+                                    <NiceSelect options={vehiclesList} defaultValue="Select Vehicle" onChange={(v) => handleChange("vehicle", v)} />
                                 </div>
                             </div>
                             <div className="form-group col-md-6 col-lg-auto">

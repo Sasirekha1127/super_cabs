@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
+import usePublicContent from '../../services/usePublicContent';
 
 const styles = `
 .ap-section {
@@ -107,15 +107,60 @@ const styles = `
 `;
 
 function AirportPackages() {
+    const tariffItems = usePublicContent('tariff');
+    const apItem = tariffItems?.find(it => it.slug === 'airport-packages');
+
+    const secSubtitle = apItem?.subtitle || "Airport Transfers";
+    const secTitle = apItem?.title || "Airport Taxi Packages";
+    const secDesc = apItem?.description || "Punctual, stress-free airport drop and pickup transfers. Fixed upfront tariff, round-the-clock availability, and complimentary flight delay tracking.";
+
+    const card1 = apItem?.card1 || {
+        badge: "Departure Transfer",
+        icon: "fa-plane-departure",
+        title: "City To Airport Drop",
+        desc: "Never miss a flight. We schedule your doorstep pickup with an optimized travel buffer so you arrive at the airport with ample time for check-in and boarding security.",
+        specs: [
+            { icon: "fa-shield-halved", text: "Guaranteed on-time" },
+            { icon: "fa-car", text: "Clean AC Sedan / SUV" },
+            { icon: "fa-file-invoice", text: "Fastag toll included/clear" },
+            { icon: "fa-clock", text: "24/7 Advance booking" }
+        ],
+        list: [
+            "Doorstep pickup from any residential address, hotel, or office in the city.",
+            "Direct drop at your terminal departure gate (Terminal 1 or Terminal 2).",
+            "Driver contacts you 30 minutes before pickup time to ensure total peace of mind.",
+            "Spacious clean boots suitable for domestic & international check-in baggage."
+        ]
+    };
+
+    const card2 = apItem?.card2 || {
+        badge: "Arrival Transfer",
+        icon: "fa-plane-arrival",
+        title: "Airport To City Pickup",
+        desc: "Land relaxed knowing your verified chauffeur is waiting outside the arrival terminal. Complete with flight delay tracking and free waiting time at zero extra cost.",
+        specs: [
+            { icon: "fa-satellite-dish", text: "Flight tracking included" },
+            { icon: "fa-hourglass-start", text: "45 Mins free waiting" },
+            { icon: "fa-hand-holding-hand", text: "Terminal meet & greet" },
+            { icon: "fa-snowflake", text: "Chilled AC ready cabin" }
+        ],
+        list: [
+            "Share your flight number — we track departure, delays, and touchdown times.",
+            "Driver arrives at the terminal pickup lane 15 minutes before your flight lands.",
+            "Chauffeur assists with luggage and escorts you safely to the sanitized vehicle.",
+            "Flat tariff with zero parking surprise or midnight surcharge."
+        ]
+    };
+
     return (
         <section className="ap-section space">
             <style>{styles}</style>
             <div className="container">
                 <div className="title-area text-center mb-5">
-                    <span className="sub-title">Airport Transfers</span>
-                    <h2 className="sec-title">Airport Taxi Packages</h2>
+                    <span className="sub-title">{secSubtitle}</span>
+                    <h2 className="sec-title">{secTitle}</h2>
                     <p className="sec-text mx-auto" style={{ maxWidth: '640px' }}>
-                        Punctual, stress-free airport drop and pickup transfers. Fixed upfront tariff, round-the-clock availability, and complimentary flight delay tracking.
+                        {secDesc}
                     </p>
                 </div>
 
@@ -123,66 +168,52 @@ function AirportPackages() {
                     {/* Airport Drop Package */}
                     <div className="col-lg-6">
                         <div className="ap-card">
-                            <span className="ap-badge">Departure Transfer</span>
+                            <span className="ap-badge">{card1.badge}</span>
                             <div className="ap-icon-header">
-                                <i className="fa-solid fa-plane-departure"></i>
+                                <i className={`fa-solid ${card1.icon || 'fa-plane-departure'}`}></i>
                             </div>
-                            <h3 className="ap-title">City To Airport Drop</h3>
-                            <p className="ap-desc">
-                                Never miss a flight. We schedule your doorstep pickup with an optimized travel buffer so you arrive at the airport with ample time for check-in and boarding security.
-                            </p>
+                            <h3 className="ap-title">{card1.title}</h3>
+                            <p className="ap-desc">{card1.desc}</p>
 
                             <div className="ap-specs-grid">
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-shield-halved"></i>
-                                    <span>Guaranteed on-time</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-car"></i>
-                                    <span>Clean AC Sedan / SUV</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-file-invoice"></i>
-                                    <span>Fastag toll included/clear</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-clock"></i>
-                                    <span>24/7 Advance booking</span>
-                                </div>
+                                {(card1.specs || []).map((sp, idx) => (
+                                    <div key={idx} className="ap-spec-item">
+                                        <i className={`fa-solid ${sp.icon || 'fa-check'}`}></i>
+                                        <span>{sp.text}</span>
+                                    </div>
+                                ))}
                             </div>
 
                             <ul className="ap-list">
-                                <li>
-                                    <span>Doorstep pickup from any residential address, hotel, or office in the city.</span>
-                                </li>
-                                <li>
-                                    <span>Direct drop at your terminal departure gate (Terminal 1 or Terminal 2).</span>
-                                </li>
-                                <li>
-                                    <span>Driver contacts you 30 minutes before pickup time to ensure total peace of mind.</span>
-                                </li>
-                                <li>
-                                    <span>Spacious clean boots suitable for domestic &amp; international check-in baggage.</span>
-                                </li>
+                                {(card1.list || []).map((item, idx) => (
+                                    <li key={idx}>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
 
                             <div className="d-flex gap-2 mt-auto">
-                                <Link 
-                                    to="/contact" 
-                                    state={{ enquiry: { service: "Airport Taxi", package: "Airport Drop" } }} 
-                                    className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                                >
-                                    Book Airport Drop
-                                </Link>
                                 <a 
-                                    href={waHref("Hello Super Cabs, I would like to book an Airport Drop cab.")}
+                                    href={waHref(`Hello Super Cabs, I would like to enquire about an ${card1.title} cab.`)}
                                     target={siteConfig.whatsapp ? "_blank" : undefined}
                                     rel="noopener noreferrer"
-                                    className="th-btn style1 text-center justify-content-center"
-                                    style={{ background: '#25D366', borderColor: '#25D366', padding: '12px 18px' }}
+                                    className="th-btn style1 w-100 text-center justify-content-center"
+                                    style={{ 
+                                        background: '#25D366', 
+                                        borderColor: '#25D366', 
+                                        padding: '12px 18px', 
+                                        fontSize: '14px',
+                                        fontWeight: 700,
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
                                     title="WhatsApp Airport Desk"
                                 >
-                                    <i className="fab fa-whatsapp"></i>
+                                    <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                                    <span>WhatsApp Enquire</span>
                                 </a>
                             </div>
                         </div>
@@ -191,66 +222,52 @@ function AirportPackages() {
                     {/* Airport Pickup Package */}
                     <div className="col-lg-6">
                         <div className="ap-card">
-                            <span className="ap-badge">Arrival Transfer</span>
+                            <span className="ap-badge">{card2.badge}</span>
                             <div className="ap-icon-header">
-                                <i className="fa-solid fa-plane-arrival"></i>
+                                <i className={`fa-solid ${card2.icon || 'fa-plane-arrival'}`}></i>
                             </div>
-                            <h3 className="ap-title">Airport To City Pickup</h3>
-                            <p className="ap-desc">
-                                Land relaxed knowing your verified chauffeur is waiting outside the arrival terminal. Complete with flight delay tracking and free waiting time at zero extra cost.
-                            </p>
+                            <h3 className="ap-title">{card2.title}</h3>
+                            <p className="ap-desc">{card2.desc}</p>
 
                             <div className="ap-specs-grid">
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-satellite-dish"></i>
-                                    <span>Flight tracking included</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-hourglass-start"></i>
-                                    <span>45 Mins free waiting</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-hand-holding-hand"></i>
-                                    <span>Terminal meet &amp; greet</span>
-                                </div>
-                                <div className="ap-spec-item">
-                                    <i className="fa-solid fa-snowflake"></i>
-                                    <span>Chilled AC ready cabin</span>
-                                </div>
+                                {(card2.specs || []).map((sp, idx) => (
+                                    <div key={idx} className="ap-spec-item">
+                                        <i className={`fa-solid ${sp.icon || 'fa-check'}`}></i>
+                                        <span>{sp.text}</span>
+                                    </div>
+                                ))}
                             </div>
 
                             <ul className="ap-list">
-                                <li>
-                                    <span>Share your flight number — we track departure, delays, and touchdown times.</span>
-                                </li>
-                                <li>
-                                    <span>Driver arrives at the terminal pickup lane 15 minutes before your flight lands.</span>
-                                </li>
-                                <li>
-                                    <span>Chauffeur assists with luggage and escorts you safely to the sanitized vehicle.</span>
-                                </li>
-                                <li>
-                                    <span>Flat tariff with zero parking surprise or midnight surcharge.</span>
-                                </li>
+                                {(card2.list || []).map((item, idx) => (
+                                    <li key={idx}>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
 
                             <div className="d-flex gap-2 mt-auto">
-                                <Link 
-                                    to="/contact" 
-                                    state={{ enquiry: { service: "Airport Taxi", package: "Airport Pickup" } }} 
-                                    className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                                >
-                                    Book Airport Pickup
-                                </Link>
                                 <a 
-                                    href={waHref("Hello Super Cabs, I would like to book an Airport Pickup cab.")}
+                                    href={waHref(`Hello Super Cabs, I would like to enquire about an ${card2.title} cab.`)}
                                     target={siteConfig.whatsapp ? "_blank" : undefined}
                                     rel="noopener noreferrer"
-                                    className="th-btn style1 text-center justify-content-center"
-                                    style={{ background: '#25D366', borderColor: '#25D366', padding: '12px 18px' }}
+                                    className="th-btn style1 w-100 text-center justify-content-center"
+                                    style={{ 
+                                        background: '#25D366', 
+                                        borderColor: '#25D366', 
+                                        padding: '12px 18px', 
+                                        fontSize: '14px',
+                                        fontWeight: 700,
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
                                     title="WhatsApp Airport Desk"
                                 >
-                                    <i className="fab fa-whatsapp"></i>
+                                    <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                                    <span>WhatsApp Enquire</span>
                                 </a>
                             </div>
                         </div>

@@ -1,12 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import siteConfig, { telHref } from '../data/siteConfig'
+import usePublicContent from '../../services/usePublicContent'
+import { getApiOrigin } from '../../services/api'
 
-// `to` = number that counts up. Items without `to` show `big` as plain text.
-const experienceStats = [
+const resolveImage = (img, fallback) => {
+    if (!img) return fallback;
+    if (img.startsWith('http')) return img;
+    if (img.startsWith('/uploads')) return `${getApiOrigin()}${img}`;
+    return img;
+};
+
+// Fallback pillars if not yet configured in admin
+const defaultStats = [
     {
         icon: 'fa-shield-halved',
-        to: 5, suffix: 'M+', decimals: 0,
+        big: '5M+',
         title: 'Million+ Safe KMs',
         desc: 'Navigated local city streets, hill stations, and state highways with zero tolerance for rash driving.'
     },
@@ -18,7 +27,7 @@ const experienceStats = [
     },
     {
         icon: 'fa-stopwatch',
-        to: 99.4, suffix: '%', decimals: 1,
+        big: '99.4%',
         title: 'On-Time Arrival',
         desc: 'Strict punctuality protocol for airport pickups, railway connections, and critical corporate meetings.'
     },
@@ -67,7 +76,6 @@ function useCountUp(to, run, decimals = 0, duration = 1500) {
         const tick = (now) => {
             const p = Math.min((now - t0) / duration, 1)
             setVal(to * (1 - Math.pow(1 - p, 3)))
-            if (p < 1) raf = requestAnimationFrame(tick)
         }
         raf = requestAnimationFrame(tick)
         return () => cancelAnimationFrame(raf)
@@ -76,18 +84,22 @@ function useCountUp(to, run, decimals = 0, duration = 1500) {
 }
 
 function Pillar({ item, run, index }) {
-    const n = useCountUp(item.to, run, item.decimals)
+    const numValue = item.to != null ? item.to : (parseFloat(item.big) || null);
+    const hasNum = numValue != null && !isNaN(numValue) && item.suffix;
+    const n = useCountUp(hasNum ? numValue : null, run, item.decimals || 0)
+    const displayVal = hasNum ? `${n}${item.suffix}` : (item.big || item.value || '');
+
     return (
         <li className="scx-step" style={{ '--i': index }}>
             <span className="scx-step__node">
-                <i className={`fa-solid ${item.icon}`}></i>
+                <i className={`fa-solid ${item.icon || 'fa-check'}`}></i>
             </span>
             <div className="scx-step__body">
                 <div className="scx-step__big">
-                    {item.to != null ? `${n}${item.suffix}` : item.big}
+                    {displayVal}
                 </div>
                 <h4 className="scx-step__title">{item.title}</h4>
-                <p className="scx-step__desc">{item.desc}</p>
+                <p className="scx-step__desc">{item.desc || item.description}</p>
             </div>
         </li>
     )
@@ -95,8 +107,17 @@ function Pillar({ item, run, index }) {
 
 function ExperienceSection() {
     const [ref, seen] = useInView()
-    const expYears = parseInt(siteConfig.experienceYears, 10) || 10
+    const expData = usePublicContent('about', []).find(item => item.slug === 'experience')?.data;
+
+    const expYears = Number(expData?.experienceYears) || parseInt(siteConfig.experienceYears, 10) || 10;
     const years = useCountUp(expYears, seen)
+
+    const subheading = expData?.subheading || 'Our Experience & Track Record';
+    const heading = expData?.heading || `Over ${expYears}+ Years of Safe & Dependable Travel`;
+    const description = expData?.description || 'Founded with a commitment to reliable mobility, Super Cabs has grown into a trusted travel partner. Over the years, we have mastered city transit, interstate highway journeys, airport connectivity, and tailored tour packages.';
+    const archImage = resolveImage(expData?.archImage, '/assets/img/cabs/about-1.jpg');
+    const circleImage = resolveImage(expData?.circleImage, '/assets/img/cabs/cat-outstation.jpg');
+    const statsList = Array.isArray(expData?.pillars) && expData.pillars.length > 0 ? expData.pillars : defaultStats;
 
     return (
         <section ref={ref} className={`scx-sec space ${seen ? 'is-in' : ''}`} id="experience-sec">
@@ -108,20 +129,20 @@ function ExperienceSection() {
                     <div className="col-lg-7 order-2 order-lg-1">
                         <div className="scx-content">
                             <div className="title-area mb-25">
-                                <span className="sub-title style1">Our Experience &amp; Track Record</span>
+                                <span className="sub-title style1">{subheading}</span>
                                 <h2 className="sec-title heading">
-                                    Over {expYears}+ Years of Safe &amp; Dependable Travel
+                                    {heading}
                                 </h2>
                                 <p className="sec-text">
-                                    Founded with a commitment to reliable mobility, Super Cabs has grown into a trusted travel partner. Over the years, we have mastered city transit, interstate highway journeys, airport connectivity, and tailored tour packages.
+                                    {description}
                                 </p>
                             </div>
 
                             {/* vertical route line that fills as the section opens */}
                             <ol className="scx-steps">
                                 <span className="scx-steps__line" aria-hidden="true"></span>
-                                {experienceStats.map((item, i) => (
-                                    <Pillar item={item} run={seen} index={i} key={item.title} />
+                                {statsList.map((item, i) => (
+                                    <Pillar item={item} run={seen} index={i} key={item.title || i} />
                                 ))}
                             </ol>
 
@@ -141,12 +162,12 @@ function ExperienceSection() {
                     <div className="col-lg-5 order-1 order-lg-2">
                         <div className="scx-visual">
                             <div className="scx-arch">
-                                <img src="/assets/img/cabs/about-1.jpg" alt="Experienced Chauffeur" />
+                                <img src={archImage} alt="Super Cabs Comfort Sedan Taxi" />
                                 <span className="scx-arch__curtain"></span>
                             </div>
 
                             <div className="scx-circle">
-                                <img src="/assets/img/cabs/cat-outstation.jpg" alt="Highway Road Experience" />
+                                <img src={circleImage} alt="Super Cabs Highway Outstation Cab" />
                             </div>
 
                             {/* spinning ring badge with years counter */}

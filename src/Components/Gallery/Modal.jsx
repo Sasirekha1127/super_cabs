@@ -1,6 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
+import { getApiOrigin } from '../../services/api';
+
+const resolveImageUrl = (img, fallback = '/assets/img/cabs/sedan.jpg') => {
+    if (!img) return fallback;
+    if (img.startsWith('http') || img.startsWith('data:')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads')) {
+        return `${getApiOrigin()}${img.startsWith('/') ? '' : '/'}${img}`;
+    }
+    return img;
+};
 
 const styles = `
 .spc-lightbox-overlay {
@@ -317,9 +327,10 @@ const Modal = ({
 
     // Determine current item info
     const currentItem = items && items[currentIndex] ? items[currentIndex] : null;
-    const currentSrc = currentItem ? currentItem.src : imageSrc;
+    const rawSrc = currentItem ? (currentItem.src || currentItem.image) : imageSrc;
+    const currentSrc = resolveImageUrl(rawSrc, '/assets/img/cabs/sedan.jpg');
     const title = currentItem?.title || "Super Cabs Visual Showcase";
-    const subtitle = currentItem?.subtitle || "Comfortable and sanitized taxi service across South India";
+    const subtitle = currentItem?.subtitle || currentItem?.description || "Comfortable and sanitized taxi service across South India";
     const tag = currentItem?.tag || "Gallery";
     const totalCount = items ? items.length : 1;
     const hasNav = items && items.length > 1;
@@ -330,10 +341,33 @@ const Modal = ({
             <div className="spc-lightbox-dialog" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="spc-lb-header">
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
                         <span className="spc-lb-badge">
                             <i className="fa-solid fa-camera me-1"></i> {tag}
                         </span>
+                        {currentItem?.regNo && (
+                            <span 
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    background: '#facc15',
+                                    color: '#000000',
+                                    padding: '3px 9px',
+                                    borderRadius: '4px',
+                                    fontWeight: '800',
+                                    fontSize: '11.5px',
+                                    letterSpacing: '0.6px',
+                                    border: '1.5px solid #000000',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                                    textTransform: 'uppercase'
+                                }}
+                                title="Tamil Nadu Commercial Taxi Registration"
+                            >
+                                <span style={{ fontSize: '8.5px', fontWeight: '900', borderRight: '1px solid #000', paddingRight: '4px', opacity: 0.85 }}>IND</span>
+                                <span>{currentItem.regNo}</span>
+                            </span>
+                        )}
                         {items && (
                             <span className="spc-lb-counter">
                                 {currentIndex + 1} / {totalCount}
@@ -366,7 +400,14 @@ const Modal = ({
                         </button>
                     )}
 
-                    <img src={currentSrc} alt={title} className="spc-lb-img" />
+                    <img 
+                        src={currentSrc} 
+                        alt={title} 
+                        className="spc-lb-img" 
+                        onError={(e) => {
+                            e.target.src = '/assets/img/cabs/sedan.jpg';
+                        }}
+                    />
 
                     {hasNav && onNext && (
                         <button

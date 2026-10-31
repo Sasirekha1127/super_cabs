@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import api from './api';
 
 const withManagedStatus = (items, managed) => {
@@ -11,6 +11,7 @@ const withManagedStatus = (items, managed) => {
 };
 
 export default function usePublicContent(type, fallback = []) {
+  const fallbackRef = useRef(fallback);
   const [items, setItems] = useState(fallback);
 
   useEffect(() => {
@@ -19,19 +20,19 @@ export default function usePublicContent(type, fallback = []) {
     api
       .get(`/content/public/${type}`)
       .then((result) => {
-        if (live && result.items) {
+        if (live && result?.items) {
           const managed = result.items.map((item) => ({
             ...item.data,
             id: item._id,
-            slug: item.slug || item.data.slug,
-            title: item.title || item.data.title,
+            slug: item.slug || item.data?.slug,
+            title: item.title || item.data?.title,
             isActive: item.isActive,
           }));
 
           setItems(
             result.hasManagedItems
               ? withManagedStatus(managed, true)
-              : fallback
+              : fallbackRef.current
           );
         }
       })
@@ -40,7 +41,7 @@ export default function usePublicContent(type, fallback = []) {
     return () => {
       live = false;
     };
-  }, [type, fallback]);
+  }, [type]);
 
   return items;
 }

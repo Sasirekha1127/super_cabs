@@ -10,11 +10,14 @@ const siteConfig = {
   phoneDisplay: "+91-9787541723",              // displayed on website
   whatsapp: "919787541723",                    // digits with country code (no + sign)
   email: "supercabs.in@gmail.com",             // official contact email
-  address: "No. 1, Madavan Street, Karanai Puducherry Rd, Gokulam Colony, Urapakkam, Kancheepuram, Tamil Nadu 603202", 
+  address: "4/150, East Street, TAMILNADU -606707", 
   hours: "24/7 Booking Support Available", 
   experienceYears: "10+",                      // years in business
-  mapEmbedUrl: "https://www.google.com/maps?q=No.+1,+Madavan+Street,+Karanai+Puducherry+Rd,+Gokulam+Colony,+Urapakkam,+Kancheepuram,+Tamil+Nadu+603202&output=embed",
+  mapEmbedUrl: "https://www.google.com/maps?q=4/150,+East+Street,+TAMILNADU+-606707&output=embed",
   social: { facebook: "https://facebook.com/", instagram: "https://instagram.com/", twitter: "", linkedin: "" },
+  minKmOneWay: 130,
+  minKmRoundTrip: 250,
+  driverAllowance: 400,
 };
 
 export const DEFAULT_REQUIREMENTS_TEMPLATE = `SUPERCABS

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
-import { useBookingModal } from '../Booking/BookingModalContext';
 
 const styles = `
 .vc-card {
@@ -150,7 +149,6 @@ function VehicleCard({ vehicle }) {
 
     const imgSrc = image || `/assets/img/cabs/${slug}.jpg`;
     const waLink = waHref(`Hello Super Cabs, I would like to book / enquire about the ${name} (${seats}). Please share availability and details.`);
-    const { openBookingModal } = useBookingModal();
 
     return (
         <div className="vc-card">
@@ -204,32 +202,29 @@ function VehicleCard({ vehicle }) {
                     </ul>
                 </div>
 
-                {/* Booking / Enquiry CTA */}
+                {/* WhatsApp Enquiry CTA */}
                 <div className="vc-actions">
-                    <button 
-                        type="button"
-                        onClick={() => openBookingModal({ vehicle: name })} 
-                        className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                        style={{ 
-                            padding: '11px 16px', 
-                            fontSize: '13.5px', 
-                            border: 'none', 
-                            cursor: 'pointer',
-                            background: 'var(--theme-color, #1ca8cb)',
-                            color: '#ffffff'
-                        }}
-                    >
-                        Book Now <i className="fa-solid fa-arrow-right ms-1"></i>
-                    </button>
                     <a 
                         href={waLink} 
                         target={siteConfig.whatsapp ? "_blank" : undefined}
                         rel="noopener noreferrer"
-                        className="th-btn style1 text-center justify-content-center"
-                        style={{ padding: '11px 16px', fontSize: '13.5px', background: '#25D366', borderColor: '#25D366' }}
+                        className="th-btn style1 w-100 text-center justify-content-center"
+                        style={{ 
+                            padding: '12px 18px', 
+                            fontSize: '14px', 
+                            fontWeight: 700, 
+                            background: '#25D366', 
+                            borderColor: '#25D366',
+                            color: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }}
                         title="Enquire on WhatsApp"
                     >
-                        <i className="fab fa-whatsapp me-1"></i> Enquiry
+                        <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                        <span>WhatsApp Enquire</span>
                     </a>
                 </div>
             </div>

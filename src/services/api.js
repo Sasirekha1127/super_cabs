@@ -40,7 +40,7 @@ async function request(endpoint, options = {}) {
         if (!response.ok) {
             const errorMessage = (data && data.message) || (data && data.error) || `HTTP Error ${response.status}`;
             const error = new Error(errorMessage);
-            error.status = response.status;
+            error.status = response.staus;
             error.data = data;
             throw error;
         }
@@ -62,6 +62,10 @@ export const api = {
     put: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PUT', body: JSON.stringify(body) }),
     delete: (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' }),
     baseUrl: API_BASE_URL
+};
+
+export const getApiOrigin = () => {
+    return API_BASE_URL.replace(/\/api\/?$/, '');
 };
 
 export default api;

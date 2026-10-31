@@ -31,22 +31,37 @@ function HeaderOne() {
             <header className="th-header header-layout1">
                 <div className="header-top">
                     <div className="container th-container">
-                        <div className="row justify-content-center justify-content-xl-between align-items-center">
-                            <div className="col-auto d-none d-md-block">
+                        <div className="row justify-content-between align-items-center gy-2">
+                            <div className="col-auto">
                                 <div className="header-links">
-                                    <ul>
-                                        <li className="d-none d-xl-inline-block">
-                                            <i className="fa-sharp fa-regular  fa-location-dot" />
-                                            <span>{siteConfig.address}</span>
+                                    <ul className="d-flex align-items-center flex-wrap" style={{ gap: '14px', margin: 0, padding: 0, listStyle: 'none' }}>
+                                        <li style={{ color: '#0f172a', fontWeight: '600' }}>
+                                            <span style={{
+                                                backgroundColor: 'rgba(28, 168, 203, 0.12)',
+                                                color: 'var(--theme-color, #1ca8cb)',
+                                                padding: '3px 9px',
+                                                borderRadius: '16px',
+                                                fontSize: '11.5px',
+                                                fontWeight: '700',
+                                                marginRight: '6px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '5px'
+                                            }}>
+                                                <i className="fa-solid fa-car-side" /> Service Available :
+                                            </span>
+                                            <span style={{ fontSize: '13px', color: '#1e293b', fontWeight: '700' }}>
+                                                * Tamilnadu &nbsp;* Karnataka &nbsp;* Pudhuchery
+                                            </span>
                                         </li>
-                                        <li className="d-none d-xl-inline-block">
-                                            <i className="fa-regular fa-clock" />
-                                            <span>{siteConfig.hours}</span>
+                                        <li className="d-none d-xl-inline-flex align-items-center" style={{ fontSize: '12.5px', color: '#64748b' }}>
+                                            <i className="fa-sharp fa-regular fa-location-dot" style={{ color: 'var(--theme-color, #1ca8cb)', marginRight: '6px' }} />
+                                            <span>{siteConfig.address}</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-                            <div className="col-auto">
+                            <div className="col-auto d-none d-md-block">
                                 <div className="header-right">
                                     <div className="header-social-wrap">
                                         <span className="social-title">Follow Us :</span>

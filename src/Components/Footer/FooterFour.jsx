@@ -546,6 +546,11 @@ function FooterFour() {
                                 </a>
                             )}
                         </div>
+
+                        <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 14px', background: 'rgba(28, 168, 203, 0.1)', border: '1px solid rgba(28, 168, 203, 0.25)', borderRadius: '20px', fontSize: '12px', color: '#e2e8f0' }}>
+                            <i className="fa-solid fa-credit-card" style={{ color: 'var(--theme-color, #1ca8cb)' }}></i>
+                            <span><strong>Razorpay &amp; Cards Accepted</strong> (Credit/Debit/UPI)</span>
+                        </div>
                     </div>
 
                     {/* Col 2: Our Cab Services */}
@@ -568,9 +573,9 @@ function FooterFour() {
                         <ul className="sc-footer-links">
                             <li><Link to="/"><i className="fa-solid fa-chevron-right"></i> Home</Link></li>
                             <li><Link to="/about"><i className="fa-solid fa-chevron-right"></i> About Us</Link></li>
+                            <li><Link to="/tariff"><i className="fa-solid fa-chevron-right"></i> Tariff &amp; Pricing</Link></li>
                             <li><Link to="/services"><i className="fa-solid fa-chevron-right"></i> Taxi Services</Link></li>
                             <li><Link to="/fleet"><i className="fa-solid fa-chevron-right"></i> Our Fleet</Link></li>
-                            <li><Link to="/tariff"><i className="fa-solid fa-chevron-right"></i> Tariff &amp; Pricing</Link></li>
                             <li><Link to="/gallery"><i className="fa-solid fa-chevron-right"></i> Photo Gallery</Link></li>
                             <li><Link to="/contact"><i className="fa-solid fa-chevron-right"></i> Contact Us</Link></li>
                         </ul>
@@ -638,20 +643,10 @@ function FooterFour() {
                             </span>
                         </div>
                         <div className="col-md-6 text-center text-md-end">
-                            <span style={{ color: '#94a3b8', fontSize: '13px' }}>
-                                Developed by{' '}
-                                <a 
-                                    href="https://saitechnosolutions.com" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        color: 'var(--theme-color, #1ca8cb)',
-                                        fontWeight: '700',
-                                        textDecoration: 'none'
-                                    }}
-                                >
-                                    Sai Techno Solutions
-                                </a>
+                            <span style={{ color: '#94a3b8', fontSize: '12.5px', display: 'inline-flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <i className="fa-solid fa-credit-card" style={{ color: 'var(--theme-color, #1ca8cb)' }}></i>
+                                <span style={{ color: '#ffffff', fontWeight: '600' }}>Razorpay &amp; Cards Acceptable</span>
+                                <span style={{ opacity: 0.75 }}>&bull; Credit/Debit Cards &bull; UPI &bull; NetBanking</span>
                             </span>
                         </div>
                     </div>

@@ -4,12 +4,6 @@ import usePublicContent from '../../services/usePublicContent';
 
 const SLIDE_TIME = 3000 // ms - speed maatha inga change pannunga
 
-const slides = [
-    { src: "/assets/img/cabs/about-1.jpg", alt: "Professional Chauffeur & Fleet" },
-    { src: "/assets/img/cabs/about-2.jpg", alt: "Premium Clean Cab Interior" },
-    { src: "/assets/img/cabs/about-3.jpg", alt: "Dedicated Customer Service" },
-]
-
 /* CSS ellam inge-ye irukku, vera file la add panna thevai illa */
 const sliderCss = `
 .about-slider {
@@ -148,13 +142,25 @@ function AboutOne() {
     const aboutEntries = usePublicContent('about', []);
     const about = aboutEntries.find(item => item.slug === 'main') || aboutEntries.find(item => !['vision', 'mission'].includes(item.slug));
 
+    const defaultSlides = [
+        { src: "/assets/img/cabs/about-1.jpg", alt: "Super Cabs Comfort Sedan" },
+        { src: "/assets/img/cabs/about-2.jpg", alt: "Spacious Innova Crysta MPV" },
+        { src: "/assets/img/cabs/about-3.jpg", alt: "Super Cabs Clean Fleet Lineup" },
+    ];
+
+    const dynamicSlides = [
+        { src: about?.image || defaultSlides[0].src, alt: about?.alt || about?.imageAlt || defaultSlides[0].alt },
+        { src: about?.image2 || defaultSlides[1].src, alt: about?.image2Alt || defaultSlides[1].alt },
+        { src: about?.image3 || defaultSlides[2].src, alt: about?.image3Alt || defaultSlides[2].alt }
+    ];
+
     // active maarum bodhu timer reset aagum (thumbnail click pannaalum correct-aa odum)
     useEffect(() => {
         const timer = setTimeout(() => {
-            setActive((prev) => (prev + 1) % slides.length)
+            setActive((prev) => (prev + 1) % dynamicSlides.length)
         }, SLIDE_TIME)
         return () => clearTimeout(timer)
-    }, [active])
+    }, [active, dynamicSlides.length])
 
     return (
         <div
@@ -169,30 +175,30 @@ function AboutOne() {
                         <div className="about-slider">
                             {/* Main auto-changing image */}
                             <div className="about-slider_main">
-                                {slides.map((slide, i) => (
+                                {dynamicSlides.map((slide, i) => (
                                     <img
-                                        key={slide.src}
-                                        src={i === 0 && about?.image ? about.image : slide.src}
-                                        alt={i === 0 && about?.alt ? about.alt : slide.alt}
+                                        key={slide.src + i}
+                                        src={slide.src}
+                                        alt={slide.alt}
                                         className={i === active ? "slide-img active" : "slide-img"}
                                     />
                                 ))}
                                 <div className="about-slider_badge">
-                                    {slides[active].alt}
+                                    {about?.badge || dynamicSlides[active]?.alt}
                                 </div>
                             </div>
 
                             {/* Thumbnails */}
                             <div className="about-slider_thumbs">
-                                {slides.map((slide, i) => (
+                                {dynamicSlides.map((slide, i) => (
                                     <button
                                         type="button"
-                                        key={slide.src}
+                                        key={slide.src + i}
                                         className={i === active ? "thumb active" : "thumb"}
                                         onClick={() => setActive(i)}
                                         aria-label={`Show ${slide.alt}`}
                                     >
-                                        <img src={slide.src} alt="" />
+                                        <img src={slide.src} alt={slide.alt || "Super Cabs Fleet"} />
                                         <span className="thumb-progress" />
                                     </button>
                                 ))}
@@ -214,30 +220,30 @@ function AboutOne() {
                             <div className="about-item-wrap">
                                 <div className="about-item">
                                     <div className="about-item_img">
-                                        <img src="/assets/img/icon/map3.svg" alt="" />
+                                        <img src={about?.feature1Icon || "/assets/img/icon/map3.svg"} alt="Taxi route map" />
                                     </div>
                                     <div className="about-item_centent">
-                                        <h5 className="box-title">Wide Range of Taxi Services</h5>
+                                        <h5 className="box-title">{about?.feature1Title || "Wide Range of Taxi Services"}</h5>
                                         <p className="about-item_text">
-                                            Local, outstation, airport, one-way, round-trip and corporate taxis.
+                                            {about?.feature1Text || "Local, outstation, airport, one-way, round-trip and corporate taxis."}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="about-item">
                                     <div className="about-item_img">
-                                        <img src="/assets/img/icon/guide.svg" alt="" />
+                                        <img src={about?.feature2Icon || "/assets/img/icon/guide.svg"} alt="Route chauffeur guide" />
                                     </div>
                                     <div className="about-item_centent">
-                                        <h5 className="box-title">Professional Drivers</h5>
+                                        <h5 className="box-title">{about?.feature2Title || "Professional Drivers"}</h5>
                                         <p className="about-item_text">
-                                            Courteous, experienced drivers who know the routes well.
+                                            {about?.feature2Text || "Courteous, experienced drivers who know the routes well."}
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-35">
-                                <Link to="/about" className="th-btn style1 th-icon">
-                                    Learn More
+                                <Link to={about?.buttonLink || "/about"} className="th-btn style1 th-icon">
+                                    {about?.buttonText || "Learn More"}
                                 </Link>
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
+import usePublicContent from '../../services/usePublicContent';
 
 const styles = `
 .ow-section {
@@ -116,15 +116,50 @@ const styles = `
 `;
 
 function OneWayRoundTripDetails() {
+    const tariffItems = usePublicContent('tariff');
+    const owItem = tariffItems?.find(it => it.slug === 'outstation-details');
+
+    const secSubtitle = owItem?.subtitle || "Outstation Tariff Comparison";
+    const secTitle = owItem?.title || "One-Way vs. Round-Trip Details";
+    const secDesc = owItem?.description || "Understand the clear difference between single-drop outstation transfers and multi-day round-trip packages to choose the most cost-effective option for your travel.";
+
+    const card1 = owItem?.card1 || {
+        tag: "Pay For Single Journey Only",
+        title: "One-Way Drop Taxi",
+        subtitle: "Point A to Point B Direct Highway Travel",
+        desc: "Traveling one way to another city? Don't pay for the cab's empty return trip. Our one-way taxi package charges strictly for the single-direction distance, saving you up to 40% on overall travel costs.",
+        points: [
+            "No Return Fare: Pay only for the one-way kilometers traveled from your pickup address to your destination.",
+            "Doorstep Pickup & Drop: Direct pickup from your home or office and drop right at your final address.",
+            "Zero Return Waiting: The driver drops you off and departs. No hourly waiting charges or return commitments.",
+            "Ideal For: City relocation, university visits, single-way business meetings, and one-sided airport transfers.",
+            "Dedicated AC Vehicles: Clean hatchbacks, sedans, and SUVs available on short notice."
+        ]
+    };
+
+    const card2 = owItem?.card2 || {
+        tag: "Dedicated Cab At Your Disposal",
+        title: "Round-Trip Outstation Taxi",
+        subtitle: "Multi-Day Tours, Vacations & Temple Circuits",
+        desc: "Need a dedicated vehicle throughout your vacation or business tour? The vehicle and chauffeur stay exclusively with you, providing complete freedom to explore attractions and make impromptu stops.",
+        points: [
+            "Dedicated Chauffeur & Cab: Vehicle remains with you for local sightseeing, shopping, dining, and return journey.",
+            "Flexible Multiple Stops: Stop anytime for scenic viewpoints, roadside restaurants, and temple darshans.",
+            "Fair Km Calculation: Standard minimum 250 km/day billing ensures the lowest per-km rate.",
+            "Ideal For: Family holiday getaways, hill station weekend trips, wedding guest transfers, and multi-day tours.",
+            "Highway Trained Drivers: Experienced on long hill station curves, ghat roads, and national expressways."
+        ]
+    };
+
     return (
         <section className="ow-section space">
             <style>{styles}</style>
             <div className="container">
                 <div className="title-area text-center mb-5">
-                    <span className="sub-title">Outstation Tariff Comparison</span>
-                    <h2 className="sec-title">One-Way vs. Round-Trip Details</h2>
+                    <span className="sub-title">{secSubtitle}</span>
+                    <h2 className="sec-title">{secTitle}</h2>
                     <p className="sec-text mx-auto" style={{ maxWidth: '640px' }}>
-                        Understand the clear difference between single-drop outstation transfers and multi-day round-trip packages to choose the most cost-effective option for your travel.
+                        {secDesc}
                     </p>
                 </div>
 
@@ -133,56 +168,56 @@ function OneWayRoundTripDetails() {
                     <div className="col-lg-6">
                         <div className="ow-card">
                             <div>
-                                <span className="ow-tag">Pay For Single Journey Only</span>
+                                <span className="ow-tag">{card1.tag}</span>
                                 <div className="ow-header">
                                     <div className="ow-icon-wrap">
-                                        <i className="fa-solid fa-arrow-right-long"></i>
+                                        <i className={`fa-solid ${card1.icon || 'fa-arrow-right-long'}`}></i>
                                     </div>
                                     <div>
-                                        <h3 className="ow-title">One-Way Drop Taxi</h3>
-                                        <span className="text-muted" style={{ fontSize: '13px' }}>Point A to Point B Direct Highway Travel</span>
+                                        <h3 className="ow-title">{card1.title}</h3>
+                                        {card1.subtitle && <span className="text-muted" style={{ fontSize: '13px' }}>{card1.subtitle}</span>}
                                     </div>
                                 </div>
-                                <p className="ow-desc">
-                                    Traveling one way to another city? Don't pay for the cab's empty return trip. Our one-way taxi package charges strictly for the single-direction distance, saving you up to 40% on overall travel costs.
-                                </p>
+                                <p className="ow-desc">{card1.desc}</p>
                             </div>
 
                             <ul className="ow-list">
-                                <li>
-                                    <strong>No Return Fare:</strong> Pay only for the one-way kilometers traveled from your pickup address to your destination.
-                                </li>
-                                <li>
-                                    <strong>Doorstep Pickup &amp; Drop:</strong> Direct pickup from your home or office and drop right at your final address.
-                                </li>
-                                <li>
-                                    <strong>Zero Return Waiting:</strong> The driver drops you off and departs. No hourly waiting charges or return commitments.
-                                </li>
-                                <li>
-                                    <strong>Ideal For:</strong> City relocation, university visits, single-way business meetings, and one-sided airport transfers.
-                                </li>
-                                <li>
-                                    <strong>Dedicated AC Vehicles:</strong> Clean hatchbacks, sedans, and SUVs available on short notice.
-                                </li>
+                                {(card1.points || []).map((pt, idx) => {
+                                    const parts = typeof pt === 'string' ? pt.split(':') : [pt];
+                                    return (
+                                        <li key={idx}>
+                                            {parts.length > 1 ? (
+                                                <><strong>{parts[0]}:</strong>{parts.slice(1).join(':')}</>
+                                            ) : (
+                                                <span>{pt}</span>
+                                            )}
+                                        </li>
+                                    );
+                                })}
                             </ul>
 
                             <div className="ow-actions">
-                                <Link 
-                                    to="/contact" 
-                                    state={{ enquiry: { service: "One-Way Taxi", tripType: "One-Way" } }} 
-                                    className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                                >
-                                    Book One-Way Cab
-                                </Link>
                                 <a 
-                                    href={waHref("Hello Super Cabs, I would like to book a One-Way outstation cab.")}
+                                    href={waHref(`Hello Super Cabs, I would like to enquire about a ${card1.title}.`)}
                                     target={siteConfig.whatsapp ? "_blank" : undefined}
                                     rel="noopener noreferrer"
-                                    className="th-btn style1 text-center justify-content-center"
-                                    style={{ background: '#25D366', borderColor: '#25D366', padding: '12px 18px' }}
+                                    className="th-btn style1 w-100 text-center justify-content-center"
+                                    style={{ 
+                                        background: '#25D366', 
+                                        borderColor: '#25D366', 
+                                        padding: '12px 18px', 
+                                        fontSize: '14px',
+                                        fontWeight: 700,
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
                                     title="Enquire on WhatsApp"
                                 >
-                                    <i className="fab fa-whatsapp"></i>
+                                    <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                                    <span>WhatsApp Enquire</span>
                                 </a>
                             </div>
                         </div>
@@ -192,58 +227,56 @@ function OneWayRoundTripDetails() {
                     <div className="col-lg-6">
                         <div className="ow-card">
                             <div>
-                                <span className="ow-tag">
-                                    Dedicated Cab At Your Disposal
-                                </span>
+                                <span className="ow-tag">{card2.tag}</span>
                                 <div className="ow-header">
                                     <div className="ow-icon-wrap">
-                                        <i className="fa-solid fa-arrows-rotate"></i>
+                                        <i className={`fa-solid ${card2.icon || 'fa-arrows-rotate'}`}></i>
                                     </div>
                                     <div>
-                                        <h3 className="ow-title">Round-Trip Outstation Taxi</h3>
-                                        <span className="text-muted" style={{ fontSize: '13px' }}>Multi-Day Tours, Vacations &amp; Temple Circuits</span>
+                                        <h3 className="ow-title">{card2.title}</h3>
+                                        {card2.subtitle && <span className="text-muted" style={{ fontSize: '13px' }}>{card2.subtitle}</span>}
                                     </div>
                                 </div>
-                                <p className="ow-desc">
-                                    Need a dedicated vehicle throughout your vacation or business tour? The vehicle and chauffeur stay exclusively with you, providing complete freedom to explore attractions and make impromptu stops.
-                                </p>
+                                <p className="ow-desc">{card2.desc}</p>
                             </div>
 
                             <ul className="ow-list">
-                                <li>
-                                    <strong>Dedicated Chauffeur &amp; Cab:</strong> Vehicle remains with you for local sightseeing, shopping, dining, and return journey.
-                                </li>
-                                <li>
-                                    <strong>Flexible Multiple Stops:</strong> Stop anytime for scenic viewpoints, roadside restaurants, and temple darshans.
-                                </li>
-                                <li>
-                                    <strong>Fair Km Calculation:</strong> Standard minimum 250 km/day billing ensures the lowest per-km rate.
-                                </li>
-                                <li>
-                                    <strong>Ideal For:</strong> Family holiday getaways, hill station weekend trips, wedding guest transfers, and multi-day tours.
-                                </li>
-                                <li>
-                                    <strong>Highway Trained Drivers:</strong> Experienced on long hill station curves, ghat roads, and national expressways.
-                                </li>
+                                {(card2.points || []).map((pt, idx) => {
+                                    const parts = typeof pt === 'string' ? pt.split(':') : [pt];
+                                    return (
+                                        <li key={idx}>
+                                            {parts.length > 1 ? (
+                                                <><strong>{parts[0]}:</strong>{parts.slice(1).join(':')}</>
+                                            ) : (
+                                                <span>{pt}</span>
+                                            )}
+                                        </li>
+                                    );
+                                })}
                             </ul>
 
                             <div className="ow-actions">
-                                <Link 
-                                    to="/contact" 
-                                    state={{ enquiry: { service: "Outstation Taxi", tripType: "Round-Trip" } }} 
-                                    className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                                >
-                                    Book Round-Trip Cab
-                                </Link>
                                 <a 
-                                    href={waHref("Hello Super Cabs, I would like to book a Round-Trip outstation cab.")}
+                                    href={waHref(`Hello Super Cabs, I would like to enquire about a ${card2.title}.`)}
                                     target={siteConfig.whatsapp ? "_blank" : undefined}
                                     rel="noopener noreferrer"
-                                    className="th-btn style1 text-center justify-content-center"
-                                    style={{ background: '#25D366', borderColor: '#25D366', padding: '12px 18px' }}
+                                    className="th-btn style1 w-100 text-center justify-content-center"
+                                    style={{ 
+                                        background: '#25D366', 
+                                        borderColor: '#25D366', 
+                                        padding: '12px 18px', 
+                                        fontSize: '14px',
+                                        fontWeight: 700,
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
                                     title="Enquire on WhatsApp"
                                 >
-                                    <i className="fab fa-whatsapp"></i>
+                                    <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                                    <span>WhatsApp Enquire</span>
                                 </a>
                             </div>
                         </div>

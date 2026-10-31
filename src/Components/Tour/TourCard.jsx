@@ -1,13 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
+import { getApiOrigin } from '../../services/api';
+
+const resolveImageUrl = (img, fallback) => {
+    if (!img) return fallback;
+    if (img.startsWith('http') || img.startsWith('data:')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads')) {
+        return `${getApiOrigin()}${img.startsWith('/') ? '' : '/'}${img}`;
+    }
+    return img;
+};
 
 function TourCard({ tour }) {
-    const { id, title, duration, places, text, highlights, tag, image } = tour;
-    const imgSrc = image || `/assets/img/cabs/tour-${id}.jpg`;
-    const waLink = waHref(`Hello Super Cabs, I would like to book / enquire about the ${title} (${duration}).`);
+    const title = tour.title || tour.name || 'Tour Package';
+    const duration = tour.duration || '2 Days / 1 Night';
+    const places = tour.places || tour.destination || '';
+    const text = tour.text || tour.description || '';
+    const highlights = Array.isArray(tour.highlights) ? tour.highlights : [];
+    const tag = tour.tag || '';
+    const price = tour.startingFare || tour.price || '';
+    const priceSub = tour.priceSub || 'Starting Fare';
 
-    const targetUrl = `/tours/${tour.slug || tour.id}`;
+    const fallbackImg = `/assets/img/cabs/tour-${tour.id || '1'}.jpg`;
+    const imgSrc = resolveImageUrl(tour.image, fallbackImg);
+    const targetUrl = `/tours/${tour.slug || tour.id || tour._id}`;
+    const waLink = waHref(`Hello Super Cabs, I would like to book / enquire about the ${title} (${duration}).`);
 
     return (
         <div 
@@ -28,6 +46,9 @@ function TourCard({ tour }) {
                         src={imgSrc} 
                         alt={tour.alt || tour.seo?.altText || title} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+                        onError={(e) => {
+                            e.target.src = '/assets/img/cabs/banner-tours.jpg';
+                        }}
                     />
                 </Link>
                 {tag && (
@@ -114,30 +135,46 @@ function TourCard({ tour }) {
 
                 {/* Highlights */}
                 {highlights && highlights.length > 0 && (
-                    <div className="d-flex flex-wrap gap-2 mb-4">
-                        {highlights.map((h, idx) => (
+                    <div className="d-flex flex-wrap gap-2 mb-3">
+                        {highlights.slice(0, 4).map((h, idx) => (
                             <span 
                                 key={idx}
                                 style={{
-                                    fontSize: '11.5px',
-                                    fontWeight: '500',
-                                    color: '#164e63',
-                                    background: 'rgba(28, 168, 203, 0.08)',
-                                    padding: '3px 9px',
-                                    borderRadius: '12px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
+                                  fontSize: '11.5px',
+                                  fontWeight: '500',
+                                  color: '#164e63',
+                                  background: 'rgba(28, 168, 203, 0.08)',
+                                  padding: '3px 9px',
+                                  borderRadius: '12px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
                                 }}
                             >
+                                <i className="fa-solid fa-check text-theme" style={{ fontSize: '10px' }}></i>
                                 {h}
                             </span>
                         ))}
                     </div>
                 )}
 
+                {/* Starting Price Strip */}
+                {price && (
+                    <div
+                        className="d-flex align-items-center justify-content-between mb-3 pt-2"
+                        style={{ borderTop: '1px dashed #e2e8f0' }}
+                    >
+                        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>
+                            {priceSub}:
+                        </span>
+                        <strong style={{ fontSize: '15.5px', color: 'var(--theme-color, #1ca8cb)', fontWeight: '800' }}>
+                            {price}
+                        </strong>
+                    </div>
+                )}
+
                 {/* Actions Footer */}
-                <div className="mt-auto pt-3 border-top d-flex gap-2 align-items-center">
+                <div className="mt-auto pt-2 border-top d-flex gap-2 align-items-center">
                     <Link 
                         to={targetUrl} 
                         className="th-btn style4 flex-grow-1 text-center justify-content-center"

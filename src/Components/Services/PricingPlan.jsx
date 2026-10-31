@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import siteConfig, { waHref } from '../data/siteConfig';
-import { useBookingModal } from '../Booking/BookingModalContext';
 import usePublicCabs from '../../services/usePublicCabs';
+import usePublicContent from '../../services/usePublicContent';
 
 const styles = `
 .tp-section {
@@ -310,63 +310,78 @@ const styles = `
 }
 `;
 
-function PricingPlan({ className }) {
-    const packages = [
-        {
-            title: "Local City Rental",
-            tag: "Hourly City Packages",
-            icon: "fa-city",
-            featured: false,
-            desc: "Hourly packages for city shopping, business visits, medical errands, and family functions.",
-            rateMain: "Hourly / Day Slabs",
-            rateSub: "4h / 8h / 12h Slabs",
-            list: [
-                "4 Hrs / 40 Kms (Quick city errand & meetings)",
-                "8 Hrs / 80 Kms (Full day city travel & sightseeing)",
-                "12 Hrs / 120 Kms (Extended full day & suburbs)",
-                "AC clean sedans, hatchbacks & SUVs",
-                "Zero peak-hour surge charges guaranteed"
-            ],
-            service: "Local Taxi"
-        },
-        {
-            title: "Outstation Trips",
-            tag: "One-Way & Round-Trip",
-            icon: "fa-route",
-            featured: true,
-            badge: "⭐ Most Popular For Travel",
-            desc: "Single-direction drops with zero return charges, and multi-day round trips with dedicated chauffeur.",
-            rateMain: "Per-KM Tariff",
-            rateSub: "One-Way & Round-Trip",
-            list: [
-                "One-Way Drop (Pay strictly for single direction)",
-                "Round-Trip (Dedicated cab stays for entire tour)",
-                "250 Kms/day standard calculation on round trips",
-                "Highway-trained, verified & polite chauffeurs",
-                "Transparent Fastag tolls & driver bata"
-            ],
-            service: "Outstation Taxi"
-        },
-        {
-            title: "Airport Transfers",
-            tag: "Punctual Drops & Pickups",
-            icon: "fa-plane-departure",
-            featured: false,
-            desc: "Guaranteed on-time doorstep drops and flight-tracked terminal pickups at transparent flat fares.",
-            rateMain: "Fixed Flat Rate",
-            rateSub: "24/7 Flight Tracking",
-            list: [
-                "City to Airport Drop (Buffer-optimized pickup)",
-                "Airport to City Pickup (Meet & greet at arrival)",
-                "45 Mins complimentary flight delay waiting",
-                "Dedicated boot space for domestic & overseas bags",
-                "Round-the-clock early morning & midnight service"
-            ],
-            service: "Airport Taxi"
-        }
-    ];
+const defaultPackages = [
+    {
+        title: "Local City Rental",
+        tag: "Hourly City Packages",
+        icon: "fa-city",
+        featured: false,
+        desc: "Hourly packages for city shopping, business visits, medical errands, and family functions.",
+        rateMain: "Hourly / Day Slabs",
+        rateSub: "4h / 8h / 12h Slabs",
+        list: [
+            "4 Hrs / 40 Kms (Quick city errand & meetings)",
+            "8 Hrs / 80 Kms (Full day city travel & sightseeing)",
+            "12 Hrs / 120 Kms (Extended full day & suburbs)",
+            "AC clean sedans, hatchbacks & SUVs",
+            "Zero peak-hour surge charges guaranteed"
+        ],
+        service: "Local Taxi"
+    },
+    {
+        title: "Outstation Trips",
+        tag: "One-Way & Round-Trip",
+        icon: "fa-route",
+        featured: true,
+        badge: "⭐ Most Popular For Travel",
+        desc: "Single-direction drops with zero return charges, and multi-day round trips with dedicated chauffeur.",
+        rateMain: "Per-KM Tariff",
+        rateSub: "One-Way & Round-Trip",
+        list: [
+            "One-Way Drop (Pay strictly for single direction)",
+            "Round-Trip (Dedicated cab stays for entire tour)",
+            "250 Kms/day standard calculation on round trips",
+            "Highway-trained, verified & polite chauffeurs",
+            "Transparent Fastag tolls & driver bata"
+        ],
+        service: "Outstation Taxi"
+    },
+    {
+        title: "Airport Transfers",
+        tag: "Punctual Drops & Pickups",
+        icon: "fa-plane-departure",
+        featured: false,
+        desc: "Guaranteed on-time doorstep drops and flight-tracked terminal pickups at transparent flat fares.",
+        rateMain: "Fixed Flat Rate",
+        rateSub: "24/7 Flight Tracking",
+        list: [
+            "City to Airport Drop (Buffer-optimized pickup)",
+            "Airport to City Pickup (Meet & greet at arrival)",
+            "45 Mins complimentary flight delay waiting",
+            "Dedicated boot space for domestic & overseas bags",
+            "Round-the-clock early morning & midnight service"
+        ],
+        service: "Airport Taxi"
+    }
+];
 
-    const { openBookingModal } = useBookingModal();
+const defaultCorporate = {
+    title: "Corporate & Monthly Cab Rentals",
+    description: "Customized corporate transport solutions with monthly consolidated GST invoicing, dedicated executive chauffeurs, priority dispatch, and emergency vehicle backup.",
+    buttonText: "Corporate Enquiry"
+};
+
+function PricingPlan({ className }) {
+    const tariffItems = usePublicContent('tariff');
+    const packagesItem = tariffItems?.find(it => it.slug === 'packages');
+
+    const subtitle = packagesItem?.subtitle || "Transparent Tariff & Packages";
+    const title = packagesItem?.title || "Choose Your Cab Package";
+    const description = packagesItem?.description || "Upfront, transparent quotes with zero surge pricing, no return charges on one-way drops, and reliable per-km billing across Tamil Nadu and South India.";
+    const packages = (Array.isArray(packagesItem?.packages) && packagesItem.packages.length > 0)
+        ? packagesItem.packages
+        : defaultPackages;
+    const corp = packagesItem?.corporate || defaultCorporate;
 
     return (
         <section className={`tp-section ${className || 'space'}`}>
@@ -375,11 +390,11 @@ function PricingPlan({ className }) {
                 {/* Clean Header */}
                 <div className="title-area text-center mb-5">
                     <span className="tp-subtitle-pill">
-                        <i className="fa-solid fa-tags"></i> Transparent Tariff &amp; Packages
+                        <i className="fa-solid fa-tags"></i> {subtitle}
                     </span>
-                    <h2 className="sec-title mb-2">Choose Your Cab Package</h2>
+                    <h2 className="sec-title mb-2">{title}</h2>
                     <p className="sec-text mx-auto" style={{ maxWidth: '640px' }}>
-                        Upfront, transparent quotes with zero surge pricing, no return charges on one-way drops, and reliable per-km billing across Tamil Nadu and South India.
+                        {description}
                     </p>
                 </div>
 
@@ -424,25 +439,27 @@ function PricingPlan({ className }) {
                                 </ul>
 
                                 <div className="tp-actions">
-                                    <button 
-                                        type="button"
-                                        onClick={() => openBookingModal({
-                                            tab: pkg.service.toLowerCase().includes('airport') ? 'airport' : pkg.service.toLowerCase().includes('rental') || pkg.service.toLowerCase().includes('local') ? 'rental' : 'outstation'
-                                        })}
-                                        className="th-btn style4 flex-grow-1 text-center justify-content-center"
-                                        style={{ padding: '11px 18px', fontSize: '13.5px', border: 'none', cursor: 'pointer' }}
-                                    >
-                                        Book Now
-                                    </button>
                                     <a 
                                         href={waHref(`Hello Super Cabs, I would like to enquire about the ${pkg.title}.`)}
                                         target={siteConfig.whatsapp ? "_blank" : undefined}
                                         rel="noopener noreferrer"
-                                        className="th-btn style1 text-center justify-content-center"
-                                        style={{ background: '#25D366', borderColor: '#25D366', padding: '11px 16px', fontSize: '14px' }}
+                                        className="th-btn style1 w-100 text-center justify-content-center"
+                                        style={{ 
+                                            background: '#25D366', 
+                                            borderColor: '#25D366', 
+                                            padding: '12px 18px', 
+                                            fontSize: '14px',
+                                            fontWeight: 700,
+                                            color: '#ffffff',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px'
+                                        }}
                                         title="Enquire on WhatsApp"
                                     >
-                                        <i className="fab fa-whatsapp"></i>
+                                        <i className="fab fa-whatsapp" style={{ fontSize: '18px' }}></i>
+                                        <span>WhatsApp Enquire</span>
                                     </a>
                                 </div>
                             </div>
@@ -461,10 +478,10 @@ function PricingPlan({ className }) {
                                 >
                                     <i className="fa-solid fa-briefcase"></i>
                                 </div>
-                                <h4 className="text-white mb-0" style={{ fontSize: '19px' }}>Corporate &amp; Monthly Cab Rentals</h4>
+                                <h4 className="text-white mb-0" style={{ fontSize: '19px' }}>{corp.title || "Corporate & Monthly Cab Rentals"}</h4>
                             </div>
                             <p className="mb-0 text-white-50" style={{ fontSize: '13.5px', lineHeight: '1.6' }}>
-                                Customized corporate transport solutions with monthly consolidated GST invoicing, dedicated executive chauffeurs, priority dispatch, and emergency vehicle backup.
+                                {corp.description || "Customized corporate transport solutions with monthly consolidated GST invoicing, dedicated executive chauffeurs, priority dispatch, and emergency vehicle backup."}
                             </p>
                         </div>
                         <div className="col-lg-4 text-center text-lg-end">
@@ -475,7 +492,7 @@ function PricingPlan({ className }) {
                                     className="th-btn style4"
                                     style={{ padding: '10px 18px', fontSize: '13px' }}
                                 >
-                                    Corporate Enquiry
+                                    {corp.buttonText || "Corporate Enquiry"}
                                 </Link>
                                 <a 
                                     href={waHref("Hello Super Cabs, I would like to enquire about corporate cab tie-ups.")}
@@ -495,9 +512,28 @@ function PricingPlan({ className }) {
     );
 }
 
+const defaultGuidelines = [
+    { label: 'One Way Trips:', text: 'Minimum distance charged is 130 km per trip.' },
+    { label: 'Round Trips:', text: 'Minimum distance charged is 250 km per calendar day.' },
+    { label: 'Payment Modes Accepted:', text: 'Razorpay Card Payments (Credit Cards & Debit Cards - Visa, MasterCard, RuPay), UPI (GPay/PhonePe/Paytm), NetBanking, and Cash accepted.' },
+    { label: 'Driver Bata:', text: '₹400/day for Sedan, ₹500/day for SUV & Innova.' },
+    { label: 'Additional Charges:', text: 'Toll gate charges, Inter-state permits, Hill station charges & parking fees are payable directly by passenger as per actual receipts.' },
+    { label: 'Calendar Day Calculation:', text: '1 Day is calculated from 12:00 AM (midnight) to 11:59 PM (midnight).' },
+    { label: 'Air Conditioning:', text: 'AC will operate throughout the ride except on steep hill climbs / ghat roads for vehicle safety.' }
+];
+
 export function VehicleTariffTable() {
-    const { openBookingModal } = useBookingModal();
     const vehicles = usePublicCabs();
+    const tariffItems = usePublicContent('tariff');
+    const guidelinesItem = tariffItems?.find(it => it.slug === 'guidelines');
+
+    const tableSubtitle = guidelinesItem?.subtitle || "Detailed Tariff Card";
+    const tableTitle = guidelinesItem?.tableTitle || "Tariff by Vehicle Category";
+    const tableDescription = guidelinesItem?.tableDescription || "Transparent one-way and round-trip per-km tariffs with verified drivers and no hidden charges.";
+    const guideTitle = guidelinesItem?.title || "TRAVEL GUIDELINES";
+    const guidelines = (Array.isArray(guidelinesItem?.items) && guidelinesItem.items.length > 0)
+        ? guidelinesItem.items
+        : defaultGuidelines;
 
     return (
         <section className="pt-tariff-section space-bottom">
@@ -505,11 +541,11 @@ export function VehicleTariffTable() {
             <div className="container">
                 <div className="title-area text-center mb-5">
                     <span className="tp-subtitle-pill">
-                        <i className="fa-solid fa-car"></i> Detailed Tariff Card
+                        <i className="fa-solid fa-car"></i> {tableSubtitle}
                     </span>
-                    <h2 className="sec-title mb-2">Tariff by Vehicle Category</h2>
+                    <h2 className="sec-title mb-2">{tableTitle}</h2>
                     <p className="sec-text mx-auto" style={{ maxWidth: '640px' }}>
-                        Transparent one-way and round-trip per-km tariffs with verified drivers and no hidden charges.
+                        {tableDescription}
                     </p>
                 </div>
 
@@ -534,47 +570,42 @@ export function VehicleTariffTable() {
                 </div>
 
                 <div className="text-center my-4">
-                    <button 
-                        type="button" 
-                        onClick={() => openBookingModal()} 
-                        className="th-btn style1"
-                        style={{ border: 'none', cursor: 'pointer', padding: '14px 34px', fontSize: '15px' }}
+                    <a 
+                        href={waHref("Hello Super Cabs, I would like to enquire about cab tariff and rates.")}
+                        target={siteConfig.whatsapp ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                        className="th-btn style1 text-center justify-content-center"
+                        style={{ 
+                            background: '#25D366', 
+                            borderColor: '#25D366', 
+                            padding: '14px 34px', 
+                            fontSize: '15px',
+                            fontWeight: 700,
+                            color: '#ffffff',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                        title="Enquire on WhatsApp"
                     >
-                        <i className="fa-solid fa-car me-2"></i> Book Your Cab Now
-                    </button>
+                        <i className="fab fa-whatsapp" style={{ fontSize: '20px' }}></i>
+                        <span>WhatsApp Enquire</span>
+                    </a>
                 </div>
 
                 {/* TRAVEL GUIDELINES */}
                 <div className="pt-guide-wrap">
                     <h4 className="pt-guide-title">
                         <i className="fa-solid fa-file-shield text-theme"></i>
-                        TRAVEL GUIDELINES
+                        {guideTitle}
                     </h4>
                     <ul className="pt-guide-list">
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>One Way Trips:</strong> Minimum distance charged is 130 km per trip.</span>
-                        </li>
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>Round Trips:</strong> Minimum distance charged is 250 km per calendar day.</span>
-                        </li>
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>Driver Bata:</strong> ₹400/day for Sedan, ₹500/day for SUV &amp; Innova.</span>
-                        </li>
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>Additional Charges:</strong> Toll gate charges, Inter-state permits, Hill station charges &amp; parking fees are payable directly by passenger as per actual receipts.</span>
-                        </li>
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>Calendar Day Calculation:</strong> 1 Day is calculated from 12:00 AM (midnight) to 11:59 PM (midnight).</span>
-                        </li>
-                        <li>
-                            <i className="fa-solid fa-circle"></i>
-                            <span><strong>Air Conditioning:</strong> AC will operate throughout the ride except on steep hill climbs / ghat roads for vehicle safety.</span>
-                        </li>
+                        {guidelines.map((g, idx) => (
+                            <li key={idx}>
+                                <i className="fa-solid fa-circle"></i>
+                                <span>{g.label ? <strong>{g.label} </strong> : null}{g.text}</span>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

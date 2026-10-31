@@ -4,6 +4,16 @@ import { tours } from '../data/cabsData';
 import siteConfig, { telHref, waHref } from '../data/siteConfig';
 import { submitTourEnquiry } from '../../services/bookingService';
 import usePublicContent from '../../services/usePublicContent';
+import { getApiOrigin } from '../../services/api';
+
+const resolveImageUrl = (img, fallback) => {
+    if (!img) return fallback;
+    if (img.startsWith('http') || img.startsWith('data:')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads')) {
+        return `${getApiOrigin()}${img.startsWith('/') ? '' : '/'}${img}`;
+    }
+    return img;
+};
 
 const styles = `
 .td-section {
@@ -121,71 +131,70 @@ const styles = `
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid var(--theme-color, #1ca8cb);
-    box-shadow: 0 0 0 3px rgba(28, 168, 203, 0.15);
+    background: var(--theme-color, #1ca8cb);
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 2px var(--theme-color, #1ca8cb);
 }
 .td-itinerary-box {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     transition: all 0.2s ease;
 }
 .td-itinerary-box:hover {
-    background: #ffffff;
     border-color: var(--theme-color, #1ca8cb);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(28, 168, 203, 0.08);
 }
 .td-itinerary-time {
     display: inline-block;
     font-size: 11.5px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--theme-color, #1ca8cb);
-    background: rgba(28, 168, 203, 0.1);
+    background: rgba(28, 168, 203, 0.12);
     padding: 3px 10px;
     border-radius: 12px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 .td-itinerary-title {
-    font-size: 15.5px;
+    font-size: 16px;
     font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 6px;
+    color: #0b2229;
+    margin-bottom: 8px;
 }
 .td-itinerary-desc {
     font-size: 13.5px;
     color: #475569;
     line-height: 1.6;
-    margin-bottom: 0;
+    margin: 0;
 }
 .td-itinerary-points {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0;
+    margin: 6px 0 0;
 }
 .td-itinerary-points li {
-    font-size: 13.5px;
-    color: #334155;
-    margin-bottom: 7px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 6px;
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    line-height: 1.5;
-}
-.td-itinerary-points li:last-child {
-    margin-bottom: 0;
+    gap: 8px;
+    line-height: 1.45;
 }
 .td-itinerary-bullet {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: var(--theme-color, #1ca8cb);
-    margin-top: 7px;
+    margin-top: 6px;
     flex-shrink: 0;
 }
 
-/* Inclusions / Exclusions */
+/* Inclusions & Exclusions */
 .td-inc-box {
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
@@ -251,36 +260,96 @@ const styles = `
 }
 
 /* Vehicle Grid */
-.td-veh-grid {
+.td-vp-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
 }
-.td-veh-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.td-veh-card:hover, .td-veh-card.active {
+.td-vp-card {
     background: #ffffff;
-    border-color: var(--theme-color, #1ca8cb);
-    box-shadow: 0 6px 18px rgba(28, 168, 203, 0.15);
-    transform: translateY(-2px);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 22px 14px 18px;
+    text-align: center;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(11, 34, 41, 0.03);
 }
-.td-veh-name {
+.td-vp-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--theme-color, #1ca8cb);
+    box-shadow: 0 12px 24px rgba(28, 168, 203, 0.12);
+}
+.td-vp-tag {
+    position: absolute;
+    top: -10px;
+    background: var(--theme-color, #1ca8cb);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+.td-vp-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(28, 168, 203, 0.1);
+    color: var(--theme-color, #1ca8cb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+.td-vp-title {
     font-size: 14px;
     font-weight: 700;
-    color: #0f172a;
+    color: #0b2229;
     margin-bottom: 4px;
 }
-.td-veh-info {
+.td-vp-seats {
     font-size: 12px;
     color: #64748b;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+}
+.td-vp-rate-wrap {
+    margin-bottom: 14px;
+}
+.td-vp-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0b2229;
+    display: block;
+}
+.td-vp-sub {
+    font-size: 11px;
+    color: #94a3b8;
+}
+.td-vp-btn {
+    margin-top: auto;
+    width: 100%;
+    padding: 8px 12px;
+    background: #25D366;
+    color: #ffffff !important;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.td-vp-btn:hover {
+    background: #20bd5a;
+    transform: scale(1.02);
 }
 
 /* Sidebar Sticky CTA Card */
@@ -529,126 +598,119 @@ const styles = `
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-
-/* Vehicle-Wise Pricing Cards */
-.td-vp-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 22px 14px 18px;
-    text-align: center;
-    position: relative;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(11, 34, 41, 0.03);
-}
-.td-vp-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--theme-color, #1ca8cb);
-    box-shadow: 0 12px 24px rgba(28, 168, 203, 0.12);
-}
-.td-vp-tag {
-    position: absolute;
-    top: -10px;
-    background: var(--theme-color, #1ca8cb);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 10px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-.td-vp-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(28, 168, 203, 0.1);
-    color: var(--theme-color, #1ca8cb);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 12px;
-}
-.td-vp-title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #0b2229;
-    margin: 0 0 4px;
-    line-height: 1.3;
-}
-.td-vp-seats {
-    font-size: 11.5px;
-    color: #64748b;
-    margin-bottom: 12px;
-}
-.td-vp-rate-wrap {
-    margin-bottom: 14px;
-}
-.td-vp-price {
-    font-size: 19px;
-    font-weight: 800;
-    color: #0b2229;
-    display: block;
-    line-height: 1.2;
-}
-.td-vp-sub {
-    font-size: 11px;
-    color: #94a3b8;
-}
-.td-vp-btn {
-    margin-top: auto;
-    width: 100%;
-    padding: 8px 12px;
-    background: #25D366;
-    color: #ffffff !important;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-.td-vp-btn:hover {
-    background: #20bd5a;
-    transform: scale(1.02);
-}
 `;
 
-function TourDetailInner() {
+function TourDetailInner({ tour: propTour, allTours: propAllTours }) {
     const { id } = useParams();
-    const managedTours = usePublicContent('tour', tours);
+    const fetchedTours = usePublicContent('tour', tours);
+    const managedTours = propAllTours && propAllTours.length > 0 ? propAllTours : fetchedTours;
 
-    // Look up tour by slug or ID
-    const currentTour = managedTours.find((t) => 
-        t.slug === id || String(t.id) === String(id)
+    // Look up tour by prop or param
+    const currentTour = propTour || managedTours.find((t) => 
+        t.slug === id || String(t.id) === String(id) || String(t._id) === String(id)
     ) || managedTours[0] || tours[0];
 
-    const {
-        title,
-        duration,
-        places,
-        placesCovered,
-        overview,
-        itinerary,
-        highlights,
-        tag,
-        image,
-        suitableFor
-    } = currentTour;
+    const title = currentTour.title || currentTour.name || 'Tour Package';
+    const duration = currentTour.duration || '2 Days / 1 Night';
+    const places = currentTour.places || currentTour.destination || '';
+    const overview = currentTour.overview || currentTour.text || currentTour.description || '';
+    const tag = currentTour.tag || '';
+    const suitableFor = currentTour.suitableFor || '';
+    const startingFare = currentTour.startingFare || currentTour.price || '₹ 5,499';
 
-    const imgSrc = image || `/assets/img/cabs/tour-${currentTour.id}.jpg`;
+    // Parse placesCovered
+    const placesCovered = Array.isArray(currentTour.placesCovered)
+        ? currentTour.placesCovered
+        : typeof currentTour.placesCovered === 'string'
+        ? currentTour.placesCovered.split('\n').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+    // Parse highlights
+    const highlights = Array.isArray(currentTour.highlights)
+        ? currentTour.highlights
+        : typeof currentTour.highlights === 'string'
+        ? currentTour.highlights.split('\n').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+    // Parse inclusions & exclusions
+    const inclusions = Array.isArray(currentTour.inclusions)
+        ? currentTour.inclusions
+        : typeof currentTour.inclusions === 'string'
+        ? currentTour.inclusions.split('\n').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+    const exclusions = Array.isArray(currentTour.exclusions)
+        ? currentTour.exclusions
+        : typeof currentTour.exclusions === 'string'
+        ? currentTour.exclusions.split('\n').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+    // Parse itinerary
+    const itinerary = Array.isArray(currentTour.itinerary) && currentTour.itinerary.length > 0
+        ? currentTour.itinerary.map((step, idx) => {
+            if (typeof step === 'object' && step !== null) {
+                return {
+                    timeOrDay: step.timeOrDay || step.time || `Day ${idx + 1}`,
+                    title: step.title || `Day ${idx + 1} Sightseeing`,
+                    desc: step.desc || '',
+                    points: Array.isArray(step.points) ? step.points : null
+                };
+            }
+            const str = String(step || '');
+            const parts = str.split(':');
+            return {
+                timeOrDay: parts.length > 1 ? parts[0].trim() : `Day ${idx + 1}`,
+                title: parts.length > 1 ? parts.slice(1).join(':').trim() : str,
+                desc: '',
+                points: null
+            };
+        })
+        : [];
+
+    // Parse vehiclePricing
+    let vehiclePricing = [];
+    if (Array.isArray(currentTour.vehiclePricing) && currentTour.vehiclePricing.length > 0) {
+        vehiclePricing = currentTour.vehiclePricing;
+    } else {
+        const numBase = parseInt(startingFare.replace(/[^0-9]/g, ''), 10) || 5499;
+        vehiclePricing = [
+            {
+                vehicle: 'AC Sedan (New Swift Dzire / Aura)',
+                seats: '4 Passengers',
+                price: `₹ ${numBase.toLocaleString('en-IN')}`,
+                tag: 'Most Popular',
+                icon: 'fa-car'
+            },
+            {
+                vehicle: 'AC SUV (Ertiga / Carens)',
+                seats: '6 Passengers',
+                price: `₹ ${Math.round(numBase * 1.3).toLocaleString('en-IN')}`,
+                tag: 'Family Comfort',
+                icon: 'fa-van-shuttle'
+            },
+            {
+                vehicle: 'Prime SUV (Innova Crysta)',
+                seats: '7 Passengers',
+                price: `₹ ${Math.round(numBase * 1.6).toLocaleString('en-IN')}`,
+                tag: 'Supreme Comfort',
+                icon: 'fa-car-side'
+            },
+            {
+                vehicle: 'Tempo Traveller (Luxury AC)',
+                seats: '12 - 16 Passengers',
+                price: `₹ ${Math.round(numBase * 2.1).toLocaleString('en-IN')}`,
+                tag: 'Group Getaway',
+                icon: 'fa-bus'
+            }
+        ];
+    }
+
+    const fallbackImg = `/assets/img/cabs/tour-${currentTour.id || '1'}.jpg`;
+    const imgSrc = resolveImageUrl(currentTour.image, fallbackImg);
 
     // WhatsApp Direct Link
     const waLink = waHref(
-        `Hello Super Cabs, I would like to book / enquire about the "${title}" package (${duration}). Please share fare details and availability.`
+        `Hello Super Cabs, I would like to book / enquire about the "${title}" package (${duration}). Starting fare: ${startingFare}. Please share details and availability.`
     );
 
     // Form state
@@ -657,7 +719,7 @@ function TourDetailInner() {
         phone: "",
         pickup: "",
         date: "",
-        vehicle: "Comfort Sedan (Dzire / Etios • 4 Seater)",
+        vehicle: "Comfort Sedan (New Swift Dzire • 4 Seater)",
         notes: ""
     });
     const [errors, setErrors] = useState({});
@@ -685,6 +747,7 @@ function TourDetailInner() {
             `*Tour Package Booking Enquiry - Super Cabs*\n\n` +
             `📦 *Package:* ${title}\n` +
             `⏱️ *Duration:* ${duration}\n` +
+            `💵 *Starting Fare:* ${startingFare}\n` +
             `👤 *Customer Name:* ${formValues.name}\n` +
             `📞 *Phone:* +91 ${digits.slice(-10)}\n` +
             `📍 *Pickup Location:* ${formValues.pickup}\n` +
@@ -693,7 +756,7 @@ function TourDetailInner() {
             (formValues.notes ? `💬 *Special Notes:* ${formValues.notes}\n` : '');
 
         submitTourEnquiry({
-            tourId: currentTour.id,
+            tourId: currentTour.id || currentTour._id,
             tourTitle: title,
             customerName: formValues.name,
             customerPhone: digits.slice(-10),
@@ -707,7 +770,10 @@ function TourDetailInner() {
     };
 
     // Other tours for "Other Popular Packages"
-    const otherTours = managedTours.filter((t) => t.id !== currentTour.id).slice(0, 3);
+    const currentIdentifier = currentTour.slug || currentTour.id || currentTour._id;
+    const otherTours = managedTours
+        .filter((t) => (t.slug || t.id || t._id) !== currentIdentifier)
+        .slice(0, 3);
 
     return (
         <section className="td-section">
@@ -745,7 +811,10 @@ function TourDetailInner() {
                             <img 
                                 src={imgSrc} 
                                 alt={currentTour.alt || currentTour.seo?.altText || title} 
-                                style={{ width: '100%', height: '360px', objectFit: 'cover' }} 
+                                style={{ width: '100%', height: '380px', objectFit: 'cover' }} 
+                                onError={(e) => {
+                                    e.target.src = '/assets/img/cabs/banner-tours.jpg';
+                                }}
                             />
                             <div 
                                 style={{
@@ -754,7 +823,7 @@ function TourDetailInner() {
                                     left: 0,
                                     right: 0,
                                     padding: '24px 28px',
-                                    background: 'linear-gradient(180deg, transparent 0%, rgba(11, 34, 41, 0.88) 90%)',
+                                    background: 'linear-gradient(180deg, transparent 0%, rgba(11, 34, 41, 0.9) 90%)',
                                     color: '#ffffff'
                                 }}
                             >
@@ -764,7 +833,7 @@ function TourDetailInner() {
                                 <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff', margin: '0 0 6px', lineHeight: '1.25' }}>
                                     {title}
                                 </h1>
-                                <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.85)', margin: 0 }}>
+                                <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.9)', margin: 0 }}>
                                     <i className="fa-regular fa-clock me-1 text-warning"></i> {duration} • Dedicated Private AC Vehicle &amp; Verified Highway Chauffeur
                                 </p>
                             </div>
@@ -783,7 +852,9 @@ function TourDetailInner() {
                                 <div className="p-3 rounded-3 text-center" style={{ background: '#ffffff', border: '1px solid #eef2f5' }}>
                                     <i className="fa-solid fa-location-dot text-theme mb-1" style={{ fontSize: '20px' }}></i>
                                     <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Places Covered</div>
-                                    <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>{placesCovered ? `${placesCovered.length}+ Key Sights` : 'Curated Route'}</strong>
+                                    <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>
+                                        {placesCovered.length > 0 ? `${placesCovered.length}+ Key Sights` : 'Curated Route'}
+                                    </strong>
                                 </div>
                             </div>
                             <div className="col-sm-4 col-12">
@@ -805,7 +876,7 @@ function TourDetailInner() {
                                 Below are the iconic landmarks, sightseeing spots, and key destinations included in the <strong>{title}</strong>:
                             </p>
 
-                            {placesCovered && placesCovered.length > 0 ? (
+                            {placesCovered.length > 0 ? (
                                 <div className="td-places-grid">
                                     {placesCovered.map((place, idx) => (
                                         <div key={idx} className="td-place-item">
@@ -818,7 +889,7 @@ function TourDetailInner() {
                                 </div>
                             ) : (
                                 <div className="p-3 rounded-3" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '14px' }}>
-                                    <i className="fa-solid fa-route text-theme me-2"></i> {places}
+                                    <i className="fa-solid fa-route text-theme me-2"></i> {places || 'Custom sightseeing spots curated for your trip.'}
                                 </div>
                             )}
 
@@ -841,7 +912,7 @@ function TourDetailInner() {
                                 <span>Package Details &amp; Overview</span>
                             </h3>
                             <p style={{ fontSize: '14.5px', lineHeight: '1.75', color: '#334155', marginBottom: '20px' }}>
-                                {overview || currentTour.text}
+                                {overview}
                             </p>
 
                             {suitableFor && (
@@ -854,25 +925,30 @@ function TourDetailInner() {
                             )}
 
                             {/* Highlights Checklist */}
-                            <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#0b2229', marginBottom: '14px' }}>
-                                Key Package Highlights
-                            </h4>
-                            <div className="row g-2 mb-2">
-                                {highlights && highlights.map((h, i) => (
-                                    <div key={i} className="col-md-6">
-                                        <div 
-                                            className="p-2 rounded-2 d-flex align-items-center gap-2"
-                                            style={{ background: '#f8fafc', fontSize: '13px', color: '#334155' }}
-                                        >
-                                            <span>{h}</span>
-                                        </div>
+                            {highlights.length > 0 && (
+                                <>
+                                    <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#0b2229', marginBottom: '14px' }}>
+                                        Key Package Highlights
+                                    </h4>
+                                    <div className="row g-2 mb-2">
+                                        {highlights.map((h, i) => (
+                                            <div key={i} className="col-md-6">
+                                                <div 
+                                                    className="p-2 rounded-2 d-flex align-items-center gap-2"
+                                                    style={{ background: '#f8fafc', fontSize: '13px', color: '#334155' }}
+                                                >
+                                                    <i className="fa-solid fa-circle-check text-theme" style={{ fontSize: '12px' }}></i>
+                                                    <span>{h}</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                </>
+                            )}
                         </div>
 
                         {/* SECTION 3: STEP-BY-STEP ITINERARY */}
-                        {itinerary && itinerary.length > 0 && (
+                        {itinerary.length > 0 && (
                             <div className="td-card">
                                 <h3 className="td-card-title">
                                     <i className="fa-solid fa-calendar-days"></i>
@@ -910,8 +986,8 @@ function TourDetailInner() {
                             </div>
                         )}
 
-                        {/* Vehicle-Wise Tour Package Pricing */}
-                        {currentTour.vehiclePricing && currentTour.vehiclePricing.length > 0 && (
+                        {/* SECTION 4: VEHICLE-WISE PACKAGE PRICING */}
+                        {vehiclePricing.length > 0 && (
                             <div className="td-card">
                                 <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                                     <h3 className="td-card-title mb-0">
@@ -924,7 +1000,7 @@ function TourDetailInner() {
                                 </p>
 
                                 <div className="row g-3">
-                                    {currentTour.vehiclePricing.map((vp, idx) => (
+                                    {vehiclePricing.map((vp, idx) => (
                                         <div key={idx} className="col-sm-6 col-xl-3">
                                             <div className="td-vp-card">
                                                 {vp.tag && <span className="td-vp-tag">{vp.tag}</span>}
@@ -940,7 +1016,7 @@ function TourDetailInner() {
                                                     <span className="td-vp-sub">/ full tour</span>
                                                 </div>
                                                 <a 
-                                                    href={waHref(`Hello Super Cabs, I would like to book the ${title} with ${vp.vehicle} for ${vp.price}.`)}
+                                                    href={waHref(`Hello Super Cabs, I would like to book the "${title}" (${duration}) with ${vp.vehicle} for ${vp.price}. Please share availability.`)}
                                                     target={siteConfig.whatsapp ? "_blank" : undefined}
                                                     rel="noopener noreferrer"
                                                     className="td-vp-btn"
@@ -957,6 +1033,54 @@ function TourDetailInner() {
                                 </div>
                             </div>
                         )}
+
+                        {/* SECTION 5: INCLUSIONS & EXCLUSIONS */}
+                        {((inclusions && inclusions.length > 0) || (exclusions && exclusions.length > 0)) && (
+                            <div className="td-card">
+                                <h3 className="td-card-title">
+                                    <i className="fa-solid fa-clipboard-check"></i>
+                                    <span>Package Inclusions &amp; Exclusions</span>
+                                </h3>
+                                <div className="row g-3">
+                                    {inclusions && inclusions.length > 0 && (
+                                        <div className="col-md-6">
+                                            <div className="td-inc-box">
+                                                <div className="td-inc-title">
+                                                    <i className="fa-solid fa-circle-check"></i>
+                                                    <span>What&apos;s Included</span>
+                                                </div>
+                                                <ul className="td-inc-list">
+                                                    {inclusions.map((inc, i) => (
+                                                        <li key={i}>
+                                                            <i className="fa-solid fa-check"></i>
+                                                            <span>{inc}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {exclusions && exclusions.length > 0 && (
+                                        <div className="col-md-6">
+                                            <div className="td-exc-box">
+                                                <div className="td-exc-title">
+                                                    <i className="fa-solid fa-circle-xmark"></i>
+                                                    <span>What&apos;s Not Included</span>
+                                                </div>
+                                                <ul className="td-exc-list">
+                                                    {exclusions.map((exc, i) => (
+                                                        <li key={i}>
+                                                            <i className="fa-solid fa-xmark"></i>
+                                                            <span>{exc}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column: Sticky Package Enquiry CTA Box */}
@@ -970,7 +1094,7 @@ function TourDetailInner() {
                                     </div>
                                     <h3 className="td-cta-heading">{title}</h3>
                                     <p className="td-cta-sub">
-                                        All-inclusive transparent pricing with zero surprise charges.
+                                        Starting at <strong>{startingFare}</strong> with transparent pricing and zero surprise charges.
                                     </p>
                                 </div>
 
@@ -1053,9 +1177,9 @@ function TourDetailInner() {
                                                 value={formValues.vehicle}
                                                 onChange={(e) => handleFormChange("vehicle", e.target.value)}
                                             >
-                                                <option value="Comfort Sedan (Dzire / Etios • 4 Seater)">Comfort Sedan (Dzire / Etios • 4 Seater)</option>
+                                                <option value="Comfort Sedan (New Swift Dzire • 4 Seater)">Comfort Sedan (New Swift Dzire • 4 Seater)</option>
                                                 <option value="Executive Sedan (Ciaz / City • 4 Seater)">Executive Sedan (Ciaz / City • 4 Seater)</option>
-                                                <option value="Family SUV (Ertiga / Brezza • 6 Seater)">Family SUV (Ertiga / Brezza • 6 Seater)</option>
+                                                <option value="Family SUV (Ertiga / Carens • 6 Seater)">Family SUV (Ertiga / Carens • 6 Seater)</option>
                                                 <option value="Luxury MPV (Innova Crysta • 7 Seater)">Luxury MPV (Innova Crysta • 7 Seater)</option>
                                                 <option value="Tempo Traveller (12-Seater AC Luxury)">Tempo Traveller (12-Seater AC Luxury)</option>
                                             </select>
@@ -1124,14 +1248,17 @@ function TourDetailInner() {
 
                         <div className="row g-4">
                             {otherTours.map((t) => (
-                                <div key={t.id} className="col-md-4">
-                                    <Link to={`/tours/${t.slug || t.id}`} className="td-related-card">
+                                <div key={t.id || t._id} className="col-md-4">
+                                    <Link to={`/tours/${t.slug || t.id || t._id}`} className="td-related-card">
                                         <div className="td-related-img-wrap">
                                             <img 
-                                                src={t.image || `/assets/img/cabs/tour-${t.id}.jpg`} 
-                                                alt={t.alt || t.seo?.altText || t.title} 
+                                                src={resolveImageUrl(t.image, `/assets/img/cabs/tour-${t.id || '1'}.jpg`)} 
+                                                alt={t.alt || t.seo?.altText || t.title || t.name} 
                                                 className="td-related-img" 
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                                onError={(e) => {
+                                                    e.target.src = '/assets/img/cabs/banner-tours.jpg';
+                                                }}
                                             />
                                             {t.tag && (
                                                 <span 
@@ -1157,11 +1284,11 @@ function TourDetailInner() {
                                         </div>
                                         <div className="td-related-body">
                                             <div className="td-related-dur">
-                                                <i className="fa-regular fa-clock me-1"></i> {t.duration}
+                                                <i className="fa-regular fa-clock me-1"></i> {t.duration || '2 Days / 1 Night'}
                                             </div>
-                                            <h4 className="td-related-title">{t.title}</h4>
+                                            <h4 className="td-related-title">{t.title || t.name}</h4>
                                             <p className="td-related-places">
-                                                {t.places}
+                                                {t.places || t.destination}
                                             </p>
                                             <div className="mt-auto text-theme" style={{ fontSize: '13px', fontWeight: '700' }}>
                                                 Explore Package <i className="fa-solid fa-arrow-right ms-1"></i>
