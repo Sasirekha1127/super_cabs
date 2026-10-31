@@ -24,3 +24,5 @@ yarn-error.log*
 
 *-orig.jpg
 *-backup.jpg
+.vercel
+.env*.local

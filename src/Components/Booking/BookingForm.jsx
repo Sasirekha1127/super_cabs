@@ -590,8 +590,6 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
     const [mobile, setMobile] = useState("");
     const [showWhatsapp, setShowWhatsapp] = useState(false);
     const [whatsappNo, setWhatsappNo] = useState("");
-    const [showEmail, setShowEmail] = useState(false);
-    const [customerEmail, setCustomerEmail] = useState("");
 
     const [pickupDate, setPickupDate] = useState("");
     const [pickupTime, setPickupTime] = useState("");
@@ -640,8 +638,6 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
     const [calculatedDistance, setCalculatedDistance] = useState(null);
     const [calculatedDuration, setCalculatedDuration] = useState("");
     const [routeError, setRouteError] = useState("");
-    const [routeSource, setRouteSource] = useState("");
-    const [isGoogleApiConfigured, setIsGoogleApiConfigured] = useState(false);
 
     // Multi-car estimation state
     const [fareData, setFareData] = useState(null);
@@ -765,8 +761,6 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
                 if (!isCurrent) return;
                 setCalculatedDistance(res.distanceKm);
                 setCalculatedDuration(res.durationText);
-                setRouteSource(res.routeSource);
-                setIsGoogleApiConfigured(res.isGoogleApiConfigured);
                 setRouteError("");
             })
             .catch((err) => {
@@ -949,25 +943,38 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
 
     // Automatically recalculate fare whenever trip type, distance, route, or fleet changes
     useEffect(() => {
-        if (!fareData) return;
-        if (activeTab === 'outstation' && (!calculatedDistance || Number(calculatedDistance) <= 0)) {
-            setFareData(null);
-            return;
-        }
-        const results = calculateFaresForVehicles({
-            tab: activeTab,
-            tripType: outstationTripType,
-            fromCity: pickupPlace?.name || fromCity,
-            toCity: dropPlace?.name || toCity,
-            city,
-            rentFor,
-            airportTrip,
-            cabsList: availableCabs,
-            overrideDistanceKm: calculatedDistance,
-            overrideDurationText: calculatedDuration
+        setFareData((prev) => {
+            if (!prev) return null;
+            if (activeTab === 'outstation' && (!calculatedDistance || Number(calculatedDistance) <= 0)) {
+                return null;
+            }
+            return calculateFaresForVehicles({
+                tab: activeTab,
+                tripType: outstationTripType,
+                fromCity: pickupPlace?.name || fromCity,
+                toCity: dropPlace?.name || toCity,
+                city,
+                rentFor,
+                airportTrip,
+                cabsList: availableCabs,
+                overrideDistanceKm: calculatedDistance,
+                overrideDurationText: calculatedDuration
+            });
         });
-        setFareData(results);
-    }, [calculatedDistance, calculatedDuration, outstationTripType, activeTab, city, rentFor, airportTrip, availableCabs]);
+    }, [
+        calculatedDistance,
+        calculatedDuration,
+        outstationTripType,
+        activeTab,
+        city,
+        rentFor,
+        airportTrip,
+        availableCabs,
+        pickupPlace?.name,
+        dropPlace?.name,
+        fromCity,
+        toCity
+    ]);
 
     // Active vehicle fare calculations
     const activeVehicleFare = fareData?.vehicleFares?.[selectedCar]
@@ -1033,7 +1040,7 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
             remainingAmount,
             customerName: name.trim(),
             customerPhone: cleanMobile,
-            customerEmail: customerEmail.trim(),
+            customerEmail: "",
             notes: `Payment: ${paymentLabel} | Advance: Rs. ${advanceAmount} | Remaining: Rs. ${remainingAmount} | Actual: ${activeVehicleFare.actualDistanceKm} KM | Billed: ${activeVehicleFare.billingDistanceKm} KM ${activeVehicleFare.minKmApplied ? '(Min KM applied)' : ''} | Duration: ${activeVehicleFare.durationText}`
         };
 
@@ -1214,8 +1221,6 @@ function BookingForm({ initialTab = "outstation", initialVehicle = "", initialCi
             sub: `Pay full amount Rs. ${activeVehicleFare.totalFare} online via Razorpay (Credit & Debit Cards, UPI, NetBanking)`
         }
     ] : [];
-
-    const isMinKmApplied = Boolean(activeVehicleFare?.minKmApplied);
 
     return (
         <div className="bf-container">
